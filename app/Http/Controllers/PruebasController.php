@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-class PruebasController extends Controller
+class PruebasController extends Controllers
 {
     public function index()
     {
         $titulo = 'Animales';
+
         $animales = ['perro', 'gato', 'Tigre'];
 
         return view('pruebas.index', array(
             'titulo' => $titulo,
-            'animales' => $animales
+            'animales' => $animales,
         ));
     }
 }
