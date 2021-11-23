@@ -112,13 +112,14 @@ class UsuarioController extends Controller
 
         // Validar si esta vacio 
         if (!empty($params) && !empty($paramsArray)) {
+
             // Limpiar datos de espacios en blanco al principio y el final
             $paramsArray = array_map('trim', $paramsArray);
 
             // 2.-Validar datos
             $validate = Validator::make($paramsArray, [
                 'persona_id' => 'required',
-                'username' => 'required',
+                'username' => 'required|unique:usuarios',
                 'password' => 'required',
             ]);
 
@@ -128,7 +129,7 @@ class UsuarioController extends Controller
                 $data = array(
                     'status' => 'Error',
                     'code' => 400,
-                    'message' => 'El usuario no se ha creado',
+                    'message' => 'Los datos enviados no son correctos',
                     'user' => $paramsArray,
                     'errors' => $validate->errors()
                 );
@@ -159,7 +160,7 @@ class UsuarioController extends Controller
                     $data = array(
                         'status' => 'Error',
                         'code' => 404,
-                        'message' => 'Ya existe un registro con el Nro. de carnet o email.'
+                        'message' => $e
                     );
                 }
             }
