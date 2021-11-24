@@ -55,8 +55,8 @@ class Usuario extends Authenticatable
     ];
 
     // Relación de muchos a muchos
-    public function permisos()
+    public function roles()
     {
-        return $this->belongsToMany('App\models\Permiso');
+        return $this->belongsToMany('App\models\Role');
     }
 }

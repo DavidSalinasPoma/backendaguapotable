@@ -13,8 +13,11 @@ class CreatePermisoRoleTable extends Migration
      */
     public function up()
     {
-        Schema::create('permisos_roles', function (Blueprint $table) {
+        Schema::create('permiso_role', function (Blueprint $table) {
+            $table->engine = 'InnoDB';
             $table->id();
+            $table->foreignId('role_id')->constrained('roles')->onUpdate('cascade')->onDelete('restrict');
+            $table->foreignId('permiso_id')->constrained('permisos')->onUpdate('cascade')->onDelete('restrict');
             $table->timestamps();
         });
     }
@@ -26,6 +29,6 @@ class CreatePermisoRoleTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('permisos_roles');
+        Schema::dropIfExists('permiso_role');
     }
 }

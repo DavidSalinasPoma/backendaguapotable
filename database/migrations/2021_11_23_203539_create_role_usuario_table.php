@@ -13,10 +13,10 @@ class CreateRoleUsuarioTable extends Migration
      */
     public function up()
     {
-        Schema::create('roles_usuarios', function (Blueprint $table) {
+        Schema::create('role_usuario', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id();
-            $table->foreignId('persona_id')->constrained('personas')->onUpdate('cascade')->onDelete('restrict');
+            $table->foreignId('role_id')->constrained('roles')->onUpdate('cascade')->onDelete('restrict');
             $table->foreignId('usuario_id')->constrained('usuarios')->onUpdate('cascade')->onDelete('restrict');
             $table->timestamps();
         });
@@ -29,6 +29,6 @@ class CreateRoleUsuarioTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('roles_usuarios');
+        Schema::dropIfExists('role_usuario');
     }
 }

@@ -11,8 +11,8 @@ class Permiso extends Model
 
 
     // Relación de muchos a muchos
-    public function usuarios()
+    public function roles()
     {
-        return $this->belongsToMany('App\models\Usuario');
+        return $this->belongsToMany('App\models\Role');
     }
 }
