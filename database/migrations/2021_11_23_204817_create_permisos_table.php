@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePersonaPermisoTable extends Migration
+class CreatePermisosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,8 @@ class CreatePersonaPermisoTable extends Migration
      */
     public function up()
     {
-        Schema::create('persona_permiso', function (Blueprint $table) {
+        Schema::create('permisos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('persona_id')->constrained('personas')->onUpdate('cascade')->onDelete('restrict');
-            $table->foreignId('usuario_id')->constrained('usuarios')->onUpdate('cascade')->onDelete('restrict');
             $table->timestamps();
         });
     }
@@ -28,6 +26,6 @@ class CreatePersonaPermisoTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('persona_permiso');
+        Schema::dropIfExists('permisos');
     }
 }

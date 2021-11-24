@@ -10,3 +10,8 @@ php artisan route:list
 php artisan migrate:refresh
 
 ## Codigos de respuestas http
+
+## Crear una Migración
+
+php artisan make:model Etiqueta -m
+$ php artisan make:migration create_role_usuario_table --create=roles_usuarios

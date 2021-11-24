@@ -53,4 +53,10 @@ class Usuario extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // Relación de muchos a muchos
+    public function permisos()
+    {
+        return $this->belongsToMany('App\models\Permiso');
+    }
 }

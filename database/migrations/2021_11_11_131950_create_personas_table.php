@@ -17,7 +17,7 @@ class CreatePersonasTable extends Migration
 
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
-            $table->string('carnet');
+            $table->string('carnet')->unique();;
             $table->string('expedito');
             $table->string('nombres');
             $table->string('ap_paterno');
