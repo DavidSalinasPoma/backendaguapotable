@@ -55,3 +55,8 @@ Route::resource('/api/usuario', UsuarioController::class);
 // Ruta personalizada usuario
 Route::post('/api/register', [UsuarioController::class, 'register']);
 Route::post('/api/login', [UsuarioController::class, 'login']);
+
+
+/*************RUTAS PARA PERSONAS********/
+// Utilizando rutas automatica usuario 
+Route::resource('/api/persona', PersonaController::class);

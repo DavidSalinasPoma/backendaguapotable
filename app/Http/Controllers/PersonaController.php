@@ -2,10 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Persona;
+use App\Helpers\JwtAuth;
+use Exception;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 
 class PersonaController extends Controller
 {
+
+    // Metodo constructor
+    public function __construct()
+    {
+        // Utiliza la autenticacion en toda la clase excepto en los metodos de index y show.
+        $this->middleware('api.authM', ['except' => ['index', 'show', 'pruebas']]);
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +26,13 @@ class PersonaController extends Controller
      */
     public function index()
     {
-        //
+        $persona = Persona::all(); // Saca con el usuario relacionado de la base de datos
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'persona' => $persona
+        );
+        return response()->json($data, $data['code']);
     }
 
 
@@ -33,7 +52,8 @@ class PersonaController extends Controller
         // Convertimos los datos en objeto y array
         $params = json_decode($json); // objeto
         $paramsArray = json_decode($json, true); // Array
-
+        // var_dump($paramsArray);
+        // die();
 
         // Validamos si esta vacio
         if (!empty($params) && !empty($paramsArray)) {
@@ -64,25 +84,33 @@ class PersonaController extends Controller
             } else {
 
                 // CONSEGUIR EL USUARIO IDENTIFICADO->El que hace el registro.
-                $jwtAuth = new JwtAuth();
-                $token = $request->header('token-usuario', null);
-                $user = $jwtAuth->checkToken($token, true); // Devuelve el token decodificado en un objeto.
+                // $jwtAuth = new JwtAuth();
+                // $token = $request->header('token-usuario', null);
+                // $user = $jwtAuth->checkToken($token, true); // Devuelve el token decodificado en un objeto.
 
                 // Si la validacion pasa correctamente  
                 // Crear el objeto usuario para guardar en la base de datos
-                $promocion = new Promocion();
-                $promocion->titulo = $paramsArray['titulo'];
-                $promocion->descripcion = $paramsArray['descripcion'];
-                $promocion->imagen = $paramsArray['imagen'];
-                $promocion->usuarios_id = $user->sub;
+                $persona = new Persona();
+                $persona->carnet = $paramsArray['carnet'];
+                $persona->expedito = $paramsArray['expedito'];
+                $persona->nombres = $paramsArray['nombres'];
+                $persona->ap_paterno = $paramsArray['ap_paterno'];
+                $persona->ap_materno = $paramsArray['ap_materno'];
+                $persona->sexo = $paramsArray['sexo'];
+                $persona->direccion = $paramsArray['direccion'];
+                $persona->nacimiento = $paramsArray['nacimiento'];
+                $persona->estado_civil = $paramsArray['estado_civil'];
+
+                // $promocion->usuarios_id = $user->sub;
 
 
                 // 7.-GUARDAR EN LA BASE DE DATOS
-                $promocion->save();
+                $persona->save();
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
-                    'message' => 'La promoción se ha creado correctamente.',
+                    'message' => 'Se ha registrado correctamente.',
+                    'persona' => $persona
                 );
             }
         } else {
@@ -103,18 +131,23 @@ class PersonaController extends Controller
      */
     public function show($id)
     {
-        //
-    }
+        $persona = Persona::find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        // Comprobamos si es un objeto eso quiere decir si exist en la base de datos.
+        if (is_object($persona)) {
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'persona' => $persona
+            );
+        } else {
+            $data = array(
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'La persona no existe'
+            );
+        }
+        return response()->json($data, $data['code']);
     }
 
     /**
@@ -126,7 +159,88 @@ class PersonaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+
+        // Validar carnet UNIQUE en una actualización
+        $persona = Persona::find($id);
+        $carnet = $persona->carnet;
+
+
+        // 1- Recoger los datos por POST.
+        $json = $request->input('json', null);
+        $paramsArray = json_decode($json, true); // devuelve un array
+
+        if (!empty($paramsArray)) {
+
+
+            // Actualizar Usuario.
+            // 2.- Validar datos recogidos por POST. pasando al getIdentity true
+            $validate = Validator::make($paramsArray, [
+                // Validar lo que se va actualizar
+                'carnet' => 'required',
+                'expedito' => 'required',
+                'nombres' => 'required',
+                'ap_paterno' => 'required',
+                'ap_materno' => 'required',
+                'sexo' => 'required',
+                'direccion' => 'required',
+                'nacimiento' => 'required',
+                'estado_civil' => 'required',
+
+            ]);
+            // // Comprobar si los datos son validos
+            if ($validate->fails()) { // en caso si los datos fallan la validacion
+                // La validacion ha fallado
+                $data = array(
+                    'status' => 'Error',
+                    'code' => 400,
+                    'message' => 'Datos incorrectos no se puede actualizar',
+                    'errors' => $validate->errors()
+                );
+            } else {
+                // echo $carnet;
+                // echo $paramsArray['carnet'];
+                // die();
+                if ($carnet == $paramsArray['carnet']) {
+                    unset($paramsArray['carnet']);
+                }
+
+                // 4.- Quitar los campos que no quiero actualizar de la peticion.
+                // unset($paramsArray['id']);
+                // unset($paramsArray['password']);
+                // // unset($paramsArray['antiguo']);
+                unset($paramsArray['created_at']);
+                // unset($paramsArray['updated_at']);
+
+                try {
+                    // 5.- Actualizar los datos en la base de datos.
+                    Persona::where('id', $id)->update($paramsArray);
+
+                    // 6.- Devolver el array con el resultado.
+                    $data = array(
+                        'status' => 'Succes',
+                        'code' => 200,
+                        'message' => 'La persona se ha modificado correctamente',
+                        'persona' => $persona,
+                        'changes' => $paramsArray
+                    );
+                } catch (Exception $e) {
+                    $data = array(
+                        'status' => 'error',
+                        'code' => 400,
+                        'message' => 'No se hizo la modificación, Este registro con numero de carnet ya existe',
+                        'error' => $e
+                    );
+                }
+            }
+        } else {
+            $data = array(
+                'status' => 'Error',
+                'code' => 400,
+                'message' => 'No hay datos para modificar.',
+            );
+        }
+
+        return response()->json($data, $data['code']);
     }
 
     /**
@@ -137,7 +251,35 @@ class PersonaController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $persona = Persona::find($id); // Trae el usuario en formato JSON
+
+        $paramsArray = array(
+            'estado' => 0
+        );
+
+        try {
+            // 5.- Actualizar los datos en la base de datos.
+            Persona::where('id', $id)->update($paramsArray);
+
+            // 6.- Devolver el array con el resultado.
+            $data = array(
+                'status' => 'Succes',
+                'code' => 200,
+                'message' => 'La persona ha sido dado de baja correctamente',
+                'persona' => $persona,
+                'changes' => $paramsArray
+            );
+        } catch (Exception $e) {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'La persona no ha sido dado de baja',
+                'error' => $e
+
+            );
+        }
+
+        return response()->json($data, $data['code']);
     }
 
     // Pruebas de este controlador

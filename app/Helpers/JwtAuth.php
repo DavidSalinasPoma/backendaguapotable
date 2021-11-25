@@ -63,6 +63,7 @@ class JwtAuth
                 'sub' => $user->id,
                 'nombres' => $persona->nombres,
                 'ap_paterno' => $persona->ap_paterno,
+                'persona_id' => $user->persona_id,
                 'estado' => $persona->estado,
                 'created_at' => $user->created_at,
                 // Fecha que se creo el token

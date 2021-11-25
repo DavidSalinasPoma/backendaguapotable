@@ -6,6 +6,7 @@ use App\Helpers\JwtAuth;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Exception;
 
 class UsuarioController extends Controller
 {
@@ -48,7 +49,7 @@ class UsuarioController extends Controller
             $data = array(
                 'code' => 200,
                 'status' => 'success',
-                'carrera' => $usuario
+                'usuario' => $usuario
             );
         } else {
             $data = array(
