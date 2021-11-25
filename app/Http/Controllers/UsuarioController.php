@@ -9,6 +9,14 @@ use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
 {
+
+    // Metodo constructor
+    public function __construct()
+    {
+        // Utiliza la autenticacion en toda la clase excepto en los metodos de index y show.
+        $this->middleware('api.authM', ['except' => ['index', 'show', 'register', 'login', 'pruebas']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -196,12 +204,6 @@ class UsuarioController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    // Pruebas de este controlador
-    public function pruebas(Request $request)
-    {
-        return "Acción de pruebas de USUARIO-CONTROLLER";
-    }
-
     // Metodo para registrar Usuarios
     public function register(Request $request)
     {
@@ -332,5 +334,11 @@ class UsuarioController extends Controller
             }
         }
         return response()->json($singup, 200);
+    }
+
+    // Pruebas de este controlador
+    public function pruebas(Request $request)
+    {
+        return "Acción de pruebas de USUARIO-CONTROLLER";
     }
 }

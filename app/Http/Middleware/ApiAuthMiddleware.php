@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use App\Helpers\JwtAuth;
 
 class ApiAuthMiddleware
 {
@@ -32,7 +33,7 @@ class ApiAuthMiddleware
             $data = array(
                 'status' => 'Error',
                 'code' => 400,
-                'message' => 'El usuario no se esta identificado Middleware.'
+                'message' => 'El usuario no se esta identificado(msg middleware)'
             );
             return response()->json($data, $data['code']);
         }
