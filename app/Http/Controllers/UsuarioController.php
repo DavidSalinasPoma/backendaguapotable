@@ -16,28 +16,13 @@ class UsuarioController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        $user = Usuario::all(); // Saca con el usuario relacionado de la base de datos
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'usuario' => $user
+        );
+        return response()->json($data, $data['code']);
     }
 
     /**
@@ -48,18 +33,23 @@ class UsuarioController extends Controller
      */
     public function show($id)
     {
-        //
-    }
+        $usuario = Usuario::find($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        // Comprobamos si es un objeto eso quiere decir si exist en la base de datos.
+        if (is_object($usuario)) {
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'carrera' => $usuario
+            );
+        } else {
+            $data = array(
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'El usuario no existe'
+            );
+        }
+        return response()->json($data, $data['code']);
     }
 
     /**
@@ -72,8 +62,7 @@ class UsuarioController extends Controller
     public function update(Request $request, $id)
     {
         $jwtauth = new JwtAuth();
-        // echo 'hola';
-        // die();
+
         // $token que nos llega de la cabezera en un hedder de Angular
         $token = $request->header('token-usuario');
         // echo $token;
@@ -112,7 +101,7 @@ class UsuarioController extends Controller
                 $data = array(
                     'status' => 'Error',
                     'code' => 400,
-                    'message' => 'Datos incorrectos no se puede actualizar,',
+                    'message' => 'Datos incorrectos no se puede actualizar',
                     'errors' => $validate->errors()
                 );
             } else {
@@ -122,7 +111,7 @@ class UsuarioController extends Controller
                 // unset($paramsArray['password']);
                 // // unset($paramsArray['antiguo']);
                 unset($paramsArray['created_at']);
-                unset($paramsArray['updated_at']);
+                // unset($paramsArray['updated_at']);
 
                 // 3.- Cifrar la PASSWORD.
                 // $paramsArray['password'] = hash('sha256', $paramsArray['password']); // para verificar que las contraseña a consultar sean iguales.
@@ -136,8 +125,9 @@ class UsuarioController extends Controller
                     $data = array(
                         'status' => 'Succes',
                         'code' => 200,
-                        'message' => 'El usuario se ha modificado correctamente Update',
-                        'usuario' => $user_update
+                        'message' => 'El usuario se ha modificado correctamente',
+                        'usuario' => $userIdentificado,
+                        'changes' => $paramsArray
                     );
                 } catch (Exception $e) {
                     $data = array(
@@ -152,7 +142,7 @@ class UsuarioController extends Controller
             $data = array(
                 'status' => 'Error',
                 'code' => 400,
-                'message' => 'El usuario no se esta identificado correctamente update2',
+                'message' => 'El usuario no se esta identificado correctamente',
             );
         }
 
@@ -167,7 +157,43 @@ class UsuarioController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $usuario = Usuario::find($id); // Trae el usuario en formato JSON
+        $paramsArray = json_decode($usuario, true); // devuelve un array
+        // var_dump($paramsArray);
+        // die();
+
+        // Quitar los campos que no quiero actualizar de la peticion.
+        unset($paramsArray['id']);
+        unset($paramsArray['persona_id']);
+        unset($paramsArray['username']);
+        unset($paramsArray['created_at']);
+        unset($paramsArray['updated_at']);
+
+        // Campo stado a modificar
+        $paramsArray['estado'] = 0;
+
+        try {
+            // 5.- Actualizar los datos en la base de datos.
+            $user_update = Usuario::where('id', $id)->update($paramsArray);
+
+            // 6.- Devolver el array con el resultado.
+            $data = array(
+                'status' => 'Succes',
+                'code' => 200,
+                'message' => 'El usuario ha sido dado de baja correctamente',
+                'usuario' => $usuario,
+                'changes' => $paramsArray
+            );
+        } catch (Exception $e) {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'El usuario no ha sido dado de baja',
+
+            );
+        }
+
+        return response()->json($data, $data['code']);
     }
 
     // Pruebas de este controlador

@@ -104,7 +104,7 @@ class JwtAuth
 
         // Esto es suceptible a errores
         try {
-            $jwt = str_replace('"', '', $jwt); //Reemplazar comillas
+            $jwt = str_replace('"', '', $jwt); // Limpia las comillas del token
             $decode = JWT::decode($jwt, $this->key, ['HS256']); //Para decodificar el token
         } catch (\UnexpectedValueException $e) {
             $auth = false;
