@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\JwtAuth;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
@@ -70,7 +71,92 @@ class UsuarioController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $jwtauth = new JwtAuth();
+        // echo 'hola';
+        // die();
+        // $token que nos llega de la cabezera en un hedder de Angular
+        $token = $request->header('token-usuario');
+        // echo $token;
+        // die();
+
+        // 1.- Comprobar si el Usuario esta identificado.
+        $checkToken = $jwtauth->checkToken($token); // True si el token es correcto 
+        // echo $checkToken;
+        // die();
+
+        // 2.- Recoger los datos por POST.
+        $json = $request->input('json', null);
+        $paramsArray = json_decode($json, true); // devuelve un array
+
+        if ($checkToken == true && !empty($paramsArray)) {
+            // Actualizar Usuario.
+
+            // Sacar el usuario identificado
+            $userIdentificado = $jwtauth->checkToken($token, true);
+            // var_dump($userIdentificado);
+            // die();
+
+            // 3.- Validar datos recogidos por POST. pasando al getIdentity true
+            $validate = Validator::make($paramsArray, [
+
+                // 4.-Comprobar si el carnet y el email ya existe duplicado
+                // 'carnet' => 'required|unique:usuarios',
+                'username' => 'required|unique:usuarios',
+                'password' => 'required',
+                'persona_id' => 'required'
+
+            ]);
+            // // Comprobar si los datos son validos
+            if ($validate->fails()) { // en caso si los datos fallan la validacion
+                // La validacion ha fallado
+                $data = array(
+                    'status' => 'Error',
+                    'code' => 400,
+                    'message' => 'Datos incorrectos no se puede actualizar,',
+                    'errors' => $validate->errors()
+                );
+            } else {
+
+                // 4.- Quitar los campos que no quiero actualizar de la peticion.
+                // unset($paramsArray['id']);
+                // unset($paramsArray['password']);
+                // // unset($paramsArray['antiguo']);
+                unset($paramsArray['created_at']);
+                unset($paramsArray['updated_at']);
+
+                // 3.- Cifrar la PASSWORD.
+                // $paramsArray['password'] = hash('sha256', $paramsArray['password']); // para verificar que las contraseña a consultar sean iguales.
+                try {
+                    // 5.- Actualizar los datos en la base de datos.
+                    $user_update = Usuario::where('id', $id)->update($paramsArray);
+
+                    // var_dump($user_update);
+                    // die();
+                    // 6.- Devolver el array con el resultado.
+                    $data = array(
+                        'status' => 'Succes',
+                        'code' => 200,
+                        'message' => 'El usuario se ha modificado correctamente Update',
+                        'usuario' => $user_update
+                    );
+                } catch (Exception $e) {
+                    $data = array(
+                        'status' => 'error',
+                        'code' => 400,
+                        'message' => 'El nombre de usuario ya esta en uso.',
+                        // 'error' => $e
+                    );
+                }
+            }
+        } else {
+            $data = array(
+                'status' => 'Error',
+                'code' => 400,
+                'message' => 'El usuario no se esta identificado correctamente update2',
+            );
+        }
+
+        return response()->json($data, $data['code']);
     }
 
     /**
@@ -179,6 +265,46 @@ class UsuarioController extends Controller
     // Metodo para login de usuarios
     public function login(Request $request)
     {
-        return 'Accion de Login de un usuario';
+        $jwtauth = new JwtAuth();
+
+        // 1.- Recibir datos por POST.
+        $json = $request->input('json', null);
+        $params = json_decode($json); // devuelve en un obejto
+        $paramsArray = json_decode($json, true); // Devuelve en un array para hacer validaciones.
+        // var_dump($paramsArray);
+        // die();
+
+        // 2.- Validar los datos recibidos por POST.
+        $validate = Validator::make($paramsArray, [
+            // 4.-Comprobar si el usuario ya existe duplicado
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+        // Comprobar si los datos son validos
+        if ($validate->fails()) { // en caso si los datos fallan la validacion
+            // La validacion ha fallado
+            $singup = array(
+                'status' => 'Error',
+                'code' => 404,
+                'message' => 'El usuario no se ha podido identificar Faltan datos',
+                'errors' => $validate->errors()
+            );
+        } else {
+            // 3.- Cifrar la PASSWORD.
+            $pwd = hash('sha256', $params->password); // para verificar que las contraseña a consultar sean iguales.
+            // echo $pwd;
+            // die();
+
+            // 4.- Devolver token(codificado) o datos(en un objeto decodificado).
+            // Este token sera el que recibiremos con el cliente y pasaremos a cada una de las peticines
+            // http que realizemos a ciertos metodos de nuestra api, el API lo recibira y procesara el token
+            // comprobara si es correcto. y si lo es me dejara entrar y si no lo es no lo hara.
+            $singup = $jwtauth->singup($params->username, $pwd); // Por defecto token codificado.
+
+            if (!empty($params->getToken)) { // si existe y no esta vacio y no es NULL.
+                $singup = $jwtauth->singup($params->username, $pwd, true); // Token decodificado en un objeto.
+            }
+        }
+        return response()->json($singup, 200);
     }
 }
