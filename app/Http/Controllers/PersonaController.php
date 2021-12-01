@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Persona;
 use App\Helpers\JwtAuth;
+use App\Policies\PersonaPolicy;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class PersonaController extends Controller
 {
@@ -160,14 +162,23 @@ class PersonaController extends Controller
     public function update(Request $request, $id)
     {
 
+
         // Validar carnet UNIQUE en una actualización
         $persona = Persona::find($id);
+        // dd(Gate::allows('update', $persona));
+        echo 'Hola David';
+
+        $this->authorize('update', $persona);
+
         $carnet = $persona->carnet;
 
 
         // 1- Recoger los datos por POST.
         $json = $request->input('json', null);
+        // Decodificamos el json que nos llega 
+        $params = json_decode($json); // Devulve un obejto
         $paramsArray = json_decode($json, true); // devuelve un array
+
 
         if (!empty($paramsArray)) {
 
@@ -185,6 +196,7 @@ class PersonaController extends Controller
                 'direccion' => 'required',
                 'nacimiento' => 'required',
                 'estado_civil' => 'required',
+                'estado' => 'required',
 
             ]);
             // // Comprobar si los datos son validos

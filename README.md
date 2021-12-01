@@ -22,3 +22,7 @@ php artisan make:migration create_role_usuario_table --create=
 ## Creación de Middlewares
 
 php artisan make:middleware ApiAuthMiddleware
+
+## Autorizaciones
+
+php artisan make:policy PersonaPolicy --model=Persona
