@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\PruebasController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 
 /*
@@ -16,6 +18,12 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+
+
 
 // Rutas de prueba
 Route::get('/', function () {
@@ -49,12 +57,17 @@ Route::get('/usuario/pruebas', [UsuarioController::class, 'pruebas']);
 Route::get('/persona/pruebas', [PersonaController::class, 'pruebas']);
 
 
-/*************RUTAS PARA USUARIOS********/
+// /*************RUTAS PARA USUARIOS********/
 // Utilizando rutas automatica usuario 
 Route::resource('/api/usuario', UsuarioController::class);
 // Ruta personalizada usuario
-Route::post('/api/register', [UsuarioController::class, 'register']);
-Route::post('/api/login', [UsuarioController::class, 'login']);
+Route::post('/api/register', [UserController::class, 'register']);
+Route::post('/api/login', [UserController::class, 'login']);
+
+// Grupo de rutas que necesitan el token
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::post('/api/logout', [UserController::class, 'logout']);
+});
 
 
 /*************RUTAS PARA PERSONAS********/
