@@ -17,7 +17,7 @@ class PersonaController extends Controller
     public function __construct()
     {
         // Utiliza la autenticacion en toda la clase excepto en los metodos de index y show.
-        $this->middleware('api.authM', ['except' => ['index', 'show', 'pruebas']]);
+        // $this->middleware('api.authM', ['except' => ['index', 'show', 'pruebas']]);
     }
 
 

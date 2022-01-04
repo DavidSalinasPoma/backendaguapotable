@@ -20,7 +20,6 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
         'email',
         'password',
     ];
@@ -43,4 +42,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // relacion de muchos a uno inversa(muchos a uno)
+    public function persona()
+    {
+        return $this->belongsTo('App\Models\Persona', 'persona_id'); // Recibe a Persona
+    }
 }

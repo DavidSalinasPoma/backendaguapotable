@@ -57,6 +57,8 @@ Route::get('/usuario/pruebas', [UsuarioController::class, 'pruebas']);
 Route::get('/persona/pruebas', [PersonaController::class, 'pruebas']);
 
 
+
+
 // /*************RUTAS PARA USUARIOS********/
 // Utilizando rutas automatica usuario 
 Route::resource('/api/usuario', UsuarioController::class);
@@ -64,12 +66,15 @@ Route::resource('/api/usuario', UsuarioController::class);
 Route::post('/api/register', [UserController::class, 'register']);
 Route::post('/api/login', [UserController::class, 'login']);
 
+
 // Grupo de rutas que necesitan el token
 Route::group(['middleware' => ['auth:sanctum']], function () {
+
+    // Ruta para cerrar sesion o eliminar un token
     Route::post('/api/logout', [UserController::class, 'logout']);
+
+
+    /*************RUTAS PARA PERSONAS********/
+    // Utilizando rutas automatica usuario 
+    Route::resource('/api/persona', PersonaController::class);
 });
-
-
-/*************RUTAS PARA PERSONAS********/
-// Utilizando rutas automatica usuario 
-Route::resource('/api/persona', PersonaController::class);
