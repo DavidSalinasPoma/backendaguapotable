@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\PruebasController;
+use App\Http\Controllers\SocioController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
@@ -59,9 +61,7 @@ Route::get('/persona/pruebas', [PersonaController::class, 'pruebas']);
 
 
 
-// /*************RUTAS PARA USUARIOS********/
-// Utilizando rutas automatica usuario 
-Route::resource('/api/usuario', UsuarioController::class);
+
 // Ruta personalizada usuario
 Route::post('/api/register', [UserController::class, 'register']);
 Route::post('/api/login', [UserController::class, 'login']);
@@ -70,6 +70,9 @@ Route::post('/api/login', [UserController::class, 'login']);
 // Grupo de rutas que necesitan el token
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
+    // /*************RUTAS PARA USUARIOS********/
+    // Utilizando rutas automatica usuario 
+    Route::resource('/api/user', UserController::class);
     // Ruta para cerrar sesion o eliminar un token
     Route::post('/api/logout', [UserController::class, 'logout']);
 
@@ -77,4 +80,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /*************RUTAS PARA PERSONAS********/
     // Utilizando rutas automatica usuario 
     Route::resource('/api/persona', PersonaController::class);
+
+    /*************RUTAS PARA SOCIOS********/
+    // Utilizando rutas automatica socio
+    Route::resource('/api/socio', SocioController::class);
+
+    /*************RUTAS PARA EMPLEADOS********/
+    // Utilizando rutas automatica empleado 
+    Route::resource('/api/empleado', EmpleadoController::class);
 });

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Persona;
 use App\Helpers\JwtAuth;
+use App\Http\Requests\Persona\StoreRequest;
+use App\Http\Requests\Persona\UpdateRequest;
 use App\Policies\PersonaPolicy;
 use Exception;
 use Illuminate\Support\Facades\Validator;
@@ -45,83 +47,68 @@ class PersonaController extends Controller
      * @return \Illuminate\Http\Response
      */
 
-    public function store(Request $request)
+    public function store(StoreRequest $request)
     {
-        // 1.- RECIBIR DATOS
-        // Recibimos los datos de angular en una variable
-        $json = $request->input('json', null);
 
-        // Convertimos los datos en objeto y array
-        $params = json_decode($json); // objeto
-        $paramsArray = json_decode($json, true); // Array
-        // var_dump($paramsArray);
-        // die();
+        // 1.-VALIDAR DATOS
+        $validate = Validator::make($request->all(), [
+            'carnet' => 'required|unique:personas',
+            'expedito' => 'required',
+            'nombres' => 'required',
+            'ap_paterno' => 'required',
+            'ap_materno' => 'required',
+            'sexo' => 'required',
+            'direccion' => 'required',
+            'email' => 'required|email',
+            'celular' => 'required',
+            'celular_familiar' => 'required',
+            'nacimiento' => 'required',
+            'estado_civil' => 'required',
+        ]);
 
-        // Validamos si esta vacio
-        if (!empty($params) && !empty($paramsArray)) {
+        // 2.-Recoger los usuarios por post
+        $params = (object) $request->all(); // Devuelve un obejto
 
-            // 2.-VALIDAR DATOS
-            $validate = Validator::make($paramsArray, [
-                'carnet' => 'required|unique:personas',
-                'expedito' => 'required',
-                'nombres' => 'required',
-                'ap_paterno' => 'required',
-                'ap_materno' => 'required',
-                'sexo' => 'required',
-                'direccion' => 'required',
-                'nacimiento' => 'required',
-                'estado_civil' => 'required',
-            ]);
-
-            // 5.- SI LA VALIDACION FUE CORRECTA
-            // Comprobar si los datos son validos
-            if ($validate->fails()) { // en caso si los datos fallan la validacion
-                // La validacion ha fallado
-                $data = array(
-                    'status' => 'error',
-                    'code' => 400,
-                    'message' => 'El registro no se ha creado',
-                    'errors' => $validate->errors()
-                );
-            } else {
-
-                // CONSEGUIR EL USUARIO IDENTIFICADO->El que hace el registro.
-                // $jwtAuth = new JwtAuth();
-                // $token = $request->header('token-usuario', null);
-                // $user = $jwtAuth->checkToken($token, true); // Devuelve el token decodificado en un objeto.
-
-                // Si la validacion pasa correctamente  
-                // Crear el objeto usuario para guardar en la base de datos
-                $persona = new Persona();
-                $persona->carnet = $paramsArray['carnet'];
-                $persona->expedito = $paramsArray['expedito'];
-                $persona->nombres = $paramsArray['nombres'];
-                $persona->ap_paterno = $paramsArray['ap_paterno'];
-                $persona->ap_materno = $paramsArray['ap_materno'];
-                $persona->sexo = $paramsArray['sexo'];
-                $persona->direccion = $paramsArray['direccion'];
-                $persona->nacimiento = $paramsArray['nacimiento'];
-                $persona->estado_civil = $paramsArray['estado_civil'];
-
-                // $promocion->usuarios_id = $user->sub;
-
-
-                // 7.-GUARDAR EN LA BASE DE DATOS
-                $persona->save();
-                $data = array(
-                    'status' => 'success',
-                    'code' => 200,
-                    'message' => 'Se ha registrado correctamente.',
-                    'persona' => $persona
-                );
-            }
-        } else {
+        // 3.- SI LA VALIDACION FUE CORRECTA
+        // Comprobar si los datos son validos
+        if ($validate->fails()) { // en caso si los datos fallan la validacion
+            // La validacion ha fallado
             $data = array(
-                'status' => 'Error',
-                'code' => 404,
-                'message' => 'Los datos enviados no son correctos.'
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Los datos enviados no son correctos.',
+                'errors' => $validate->errors()
+            );
+        } else {
+
+
+            $persona = new Persona();
+            $persona->carnet = $params->carnet;
+            $persona->expedito = $params->expedito;
+            $persona->nombres = $params->nombres;
+            $persona->ap_paterno = $params->ap_paterno;
+            $persona->ap_materno = $params->ap_materno;
+            $persona->sexo = $params->sexo;
+            $persona->direccion = $params->direccion;
+            $persona->email = $params->email;
+            $persona->celular = $params->celular;
+            $persona->celular_familiar = $params->celular_familiar;
+            $persona->nacimiento = $params->nacimiento;
+            $persona->estado_civil = $params->estado_civil;
+
+            // $promocion->usuarios_id = $user->sub;
+
+
+            // 7.-GUARDAR EN LA BASE DE DATOS
+            $persona->save();
+            $data = array(
+                'status' => 'success',
+                'code' => 200,
+                'message' => 'Se ha registrado correctamente.',
+                'persona' => $persona
             );
         }
+
         return response()->json($data, $data['code']);
     }
 
@@ -159,98 +146,85 @@ class PersonaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
 
 
         // Validar carnet UNIQUE en una actualización
         $persona = Persona::find($id);
-        // dd(Gate::allows('update', $persona));
-        echo 'Hola David';
-
-        $this->authorize('update', $persona);
 
         $carnet = $persona->carnet;
 
+        // Actualizar Usuario.
+        // 1.- Validar datos recogidos por POST. pasando al getIdentity true
+        $validate = Validator::make($request->all(), [
+            // Validar lo que se va actualizar
+            'carnet' => 'required',
+            'expedito' => 'required',
+            'nombres' => 'required',
+            'ap_paterno' => 'required',
+            'ap_materno' => 'required',
+            'sexo' => 'required',
+            'direccion' => 'required',
+            'email' => 'required|email',
+            'celular' => 'required',
+            'celular_familiar' => 'required',
+            'nacimiento' => 'required',
+            'estado_civil' => 'required',
+            'estado' => 'required',
 
-        // 1- Recoger los datos por POST.
-        $json = $request->input('json', null);
-        // Decodificamos el json que nos llega 
-        $params = json_decode($json); // Devulve un obejto
-        $paramsArray = json_decode($json, true); // devuelve un array
+        ]);
 
+        // 2.-Recoger los usuarios por post
+        $params = (object) $request->all(); // Devuelve un obejto
+        $paramsArray = $request->all(); // Es un array
 
-        if (!empty($paramsArray)) {
-
-
-            // Actualizar Usuario.
-            // 2.- Validar datos recogidos por POST. pasando al getIdentity true
-            $validate = Validator::make($paramsArray, [
-                // Validar lo que se va actualizar
-                'carnet' => 'required',
-                'expedito' => 'required',
-                'nombres' => 'required',
-                'ap_paterno' => 'required',
-                'ap_materno' => 'required',
-                'sexo' => 'required',
-                'direccion' => 'required',
-                'nacimiento' => 'required',
-                'estado_civil' => 'required',
-                'estado' => 'required',
-
-            ]);
-            // // Comprobar si los datos son validos
-            if ($validate->fails()) { // en caso si los datos fallan la validacion
-                // La validacion ha fallado
-                $data = array(
-                    'status' => 'Error',
-                    'code' => 400,
-                    'message' => 'Datos incorrectos no se puede actualizar',
-                    'errors' => $validate->errors()
-                );
-            } else {
-                // echo $carnet;
-                // echo $paramsArray['carnet'];
-                // die();
-                if ($carnet == $paramsArray['carnet']) {
-                    unset($paramsArray['carnet']);
-                }
-
-                // 4.- Quitar los campos que no quiero actualizar de la peticion.
-                // unset($paramsArray['id']);
-                // unset($paramsArray['password']);
-                // // unset($paramsArray['antiguo']);
-                unset($paramsArray['created_at']);
-                // unset($paramsArray['updated_at']);
-
-                try {
-                    // 5.- Actualizar los datos en la base de datos.
-                    Persona::where('id', $id)->update($paramsArray);
-
-                    // 6.- Devolver el array con el resultado.
-                    $data = array(
-                        'status' => 'Succes',
-                        'code' => 200,
-                        'message' => 'La persona se ha modificado correctamente',
-                        'persona' => $persona,
-                        'changes' => $paramsArray
-                    );
-                } catch (Exception $e) {
-                    $data = array(
-                        'status' => 'error',
-                        'code' => 400,
-                        'message' => 'No se hizo la modificación, Este registro con numero de carnet ya existe',
-                        'error' => $e
-                    );
-                }
-            }
-        } else {
+        // // Comprobar si los datos son validos
+        if ($validate->fails()) { // en caso si los datos fallan la validacion
+            // La validacion ha fallado
             $data = array(
                 'status' => 'Error',
                 'code' => 400,
-                'message' => 'No hay datos para modificar.',
+                'message' => 'Datos incorrectos no se puede actualizar',
+                'errors' => $validate->errors()
             );
+        } else {
+            // echo $carnet;
+            // echo $paramsArray['carnet'];
+            // die();
+            if ($carnet == $paramsArray['carnet']) {
+                unset($paramsArray['carnet']);
+            }
+
+            // 4.- Quitar los campos que no quiero actualizar de la peticion.
+            // unset($paramsArray['id']);
+            // unset($paramsArray['password']);
+            // // unset($paramsArray['antiguo']);
+            unset($paramsArray['created_at']);
+            // unset($paramsArray['updated_at']);
+
+            try {
+                // 5.- Actualizar los datos en la base de datos.
+                Persona::where('id', $id)->update($paramsArray);
+
+                // 6.- Devolver el array con el resultado.
+                $data = array(
+                    'status' => 'Succes',
+                    'code' => 200,
+                    'message' => 'La persona se ha modificado correctamente',
+                    'persona' => $persona,
+                    'changes' => $paramsArray
+                );
+            } catch (Exception $e) {
+                $data = array(
+                    'status' => 'error',
+                    'code' => 400,
+                    'message' => 'No se hizo la modificación, Este registro con numero de carnet ya existe',
+                    'error' => $e
+                );
+            }
         }
+
 
         return response()->json($data, $data['code']);
     }

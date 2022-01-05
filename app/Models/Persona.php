@@ -19,4 +19,18 @@ class Persona extends Model
     {
         return $this->hasMany('App\Models\User'); // se dirige hacia usuarios
     }
+
+    // 2.- Para sacar todos los Socios q esten relacionados con personas
+    // es una relacion de UNO a MUCHOS
+    public function socio()
+    {
+        return $this->hasMany('App\Models\Socio'); // se dirige hacia socio
+    }
+
+    // 2.- Para sacar todos los empleados q esten relacionados con personas
+    // es una relacion de UNO a MUCHOS
+    public function empleado()
+    {
+        return $this->hasMany('App\Models\Empleado'); // se dirige hacia empleado
+    }
 }

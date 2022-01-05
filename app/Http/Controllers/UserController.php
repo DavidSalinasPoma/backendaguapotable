@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\User\UpdateRequest;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
@@ -20,28 +21,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        $user = User::all(); // Saca con el usuario relacionado de la base de datos
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'usuario' => $user
+        );
+        return response()->json($data, $data['code']);
     }
 
     /**
@@ -52,19 +38,25 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
+        $usuario = User::find($id);
+
+        // Comprobamos si es un objeto eso quiere decir si exist en la base de datos.
+        if (is_object($usuario)) {
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'usuario' => $usuario
+            );
+        } else {
+            $data = array(
+                'code' => 404,
+                'status' => 'error',
+                'message' => 'El usuario no existe'
+            );
+        }
+        return response()->json($data, $data['code']);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
@@ -73,9 +65,87 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
-        //
+
+        // Validar carnet UNIQUE en una actualización
+        $user = User::find($id);
+        // echo $user->estado;
+        // die();
+
+        if (!empty($user)) {
+
+            // 1.- Validar datos recogidos por POST. pasando al getIdentity true
+            $validate = Validator::make($request->all(), [
+
+                // 4.-Comprobar si el carnet y el email ya existe duplicado
+                // 'carnet' => 'required|unique:usuarios',
+                'email' => 'required|email',
+                'password' => 'required',
+                'persona_id' => 'required',
+                'estado' => 'required'
+
+            ]);
+
+
+            // 2.-Recoger los usuarios por post
+            $params = (object) $request->all(); // Devuelve un obejto
+            $paramsArray = $request->all(); // Es un array
+
+            // // Comprobar si los datos son validos
+            if ($validate->fails()) { // en caso si los datos fallan la validacion
+                // La validacion ha fallado
+                $data = array(
+                    'status' => 'Error',
+                    'code' => 400,
+                    'message' => 'Datos incorrectos no se puede actualizar',
+                    'errors' => $validate->errors()
+                );
+            } else {
+
+                // 4.- Quitar los campos que no quiero actualizar de la peticion.
+                // unset($paramsArray['id']);
+                // unset($paramsArray['password']);
+                // // unset($paramsArray['antiguo']);
+                unset($paramsArray['created_at']);
+                // unset($paramsArray['updated_at']);
+
+                // 3.- Cifrar la PASSWORD.
+                // $paramsArray['password'] = hash('sha256', $paramsArray['password']); // para verificar que las contraseña a consultar sean iguales.
+                try {
+                    // 5.- Actualizar los datos en la base de datos.
+                    User::where('id', $id)->update($paramsArray);
+
+                    // var_dump($user_update);
+                    // die();
+                    // 6.- Devolver el array con el resultado.
+                    $data = array(
+                        'status' => 'Succes',
+                        'code' => 200,
+                        'message' => 'El usuario se ha modificado correctamente',
+                        'usuario' => $user,
+                        'changes' => $paramsArray
+                    );
+                } catch (Exception $e) {
+                    $data = array(
+                        'status' => 'error',
+                        'code' => 400,
+                        'message' => 'El nombre de usuario ya esta en uso.',
+                        // 'error' => $e
+                    );
+                }
+            }
+
+            return response()->json($data, $data['code']);
+        } else {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Este usuario no existe.',
+                // 'error' => $e
+            );
+            return response()->json($data, $data['code']);
+        }
     }
 
     /**
@@ -86,7 +156,57 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $usuario = User::find($id); // Trae el usuario en formato JSON
+
+        // echo $user->estado;
+        // die();
+
+        if (!empty($usuario)) {
+            $paramsArray = json_decode($usuario, true); // devuelve un array
+            // var_dump($paramsArray);
+            // die();
+
+            // Quitar los campos que no quiero actualizar de la peticion.
+            unset($paramsArray['id']);
+            unset($paramsArray['persona_id']);
+            unset($paramsArray['email']);
+            unset($paramsArray['created_at']);
+            unset($paramsArray['updated_at']);
+
+            // Campo stado a modificar
+            $paramsArray['estado'] = 0;
+
+            try {
+                // 5.- Actualizar los datos en la base de datos.
+                $user_update = User::where('id', $id)->update($paramsArray);
+
+                // 6.- Devolver el array con el resultado.
+                $data = array(
+                    'status' => 'Succes',
+                    'code' => 200,
+                    'message' => 'El usuario ha sido dado de baja correctamente',
+                    'usuario' => $usuario,
+                    'changes' => $paramsArray
+                );
+            } catch (Exception $e) {
+                $data = array(
+                    'status' => 'error',
+                    'code' => 400,
+                    'message' => 'El usuario no ha sido dado de baja',
+
+                );
+            }
+
+            return response()->json($data, $data['code']);
+        } else {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Este usuario no existe.',
+                // 'error' => $e
+            );
+            return response()->json($data, $data['code']);
+        }
     }
 
 
@@ -101,8 +221,7 @@ class UserController extends Controller
 
         // 2.-Validar datos
         $validate = Validator::make($request->all(), [
-            // 'persona_id' => 'required',
-            'name' => 'required|unique:users',
+            'persona_id' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required',
         ]);
@@ -128,7 +247,7 @@ class UserController extends Controller
             // $user->persona_id = $paramsArray['persona_id'];
             // $user->username = $paramsArray['username'];
             // $user->password = $pwd;
-            $user->name = $request->name;
+            $user->persona_id = $request->persona_id;
             $user->email = $request->email;
             $user->password = $pwd;
 

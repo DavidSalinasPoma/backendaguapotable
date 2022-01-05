@@ -21,7 +21,8 @@ php artisan migrate:rollback
 \*\*para mantener la data de los pacientes
 php artisan migrate --seed
 
-php artisan migrate:refresh
+\*\*Elimina las tablas y luego las crea otra vez con datos de relleno
+php artisan migrate:fresh --seed
 
 ## Codigos de respuestas http
 
@@ -50,3 +51,7 @@ php artisan make:request RegisterRequest
 
 Si ell usuario tiene asignado un token puede acceder a las rutas de la API.
 Si el usuario no tiene Token no va a poder acceder.
+
+## Factorys rellenar datos con Factoryes
+
+php artisan make:factory PersonaFactory

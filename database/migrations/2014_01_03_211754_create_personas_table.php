@@ -24,6 +24,9 @@ class CreatePersonasTable extends Migration
             $table->string('ap_materno')->nullable();
             $table->string('sexo');
             $table->string('direccion');
+            $table->string('email');
+            $table->string('celular');
+            $table->string('celular_familiar');
             $table->string('nacimiento');
             $table->string('estado_civil');
             $table->string('estado')->default(1);
