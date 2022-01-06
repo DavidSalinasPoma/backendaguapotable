@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EmpleadoController;
+use App\Http\Controllers\EventoController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\PruebasController;
 use App\Http\Controllers\SocioController;
@@ -88,4 +89,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /*************RUTAS PARA EMPLEADOS********/
     // Utilizando rutas automatica empleado 
     Route::resource('/api/empleado', EmpleadoController::class);
+
+    /*************RUTAS PARA EVENTOS********/
+    // Utilizando rutas automatica empleado 
+    Route::resource('/api/evento', EventoController::class);
 });
