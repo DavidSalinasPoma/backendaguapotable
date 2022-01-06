@@ -46,6 +46,7 @@ class EventoController extends Controller
             'evento' => 'required|unique:eventos',
             'descripcion' => 'required',
             'precio' => 'required',
+            'tiempo_event' => 'required',
         ]);
 
         // Comprobar si los datos son validos
@@ -65,6 +66,7 @@ class EventoController extends Controller
             $evento->evento = $params->evento;
             $evento->descripcion = $params->descripcion;
             $evento->precio = $params->precio;
+            $evento->tiempo_event = $params->tiempo_event;
 
             try {
                 // Guardar en la base de datos
@@ -143,6 +145,7 @@ class EventoController extends Controller
                 'evento' => 'required',
                 'descripcion' => 'required',
                 'precio' => 'required',
+                'tiempo_event' => 'required',
                 'estado' => 'required'
 
             ]);
@@ -231,6 +234,7 @@ class EventoController extends Controller
             unset($paramsArray['evento']);
             unset($paramsArray['descripcion']);
             unset($paramsArray['precio']);
+            unset($paramsArray['tiempo_event']);
             unset($paramsArray['created_at']);
             unset($paramsArray['updated_at']);
 
