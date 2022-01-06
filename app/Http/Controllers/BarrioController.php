@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\evento\StoreRequest;
-use App\Http\Requests\evento\UpdateRequest;
-use App\Models\Evento;
+use App\Http\Requests\barrio\StoreRequest;
+use App\Http\Requests\barrio\UpdateRequest;
+use App\Models\Barrio;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class EventoController extends Controller
+class BarrioController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,11 +18,11 @@ class EventoController extends Controller
      */
     public function index()
     {
-        $evento = Evento::all(); // Saca con el usuario relacionado de la base de datos
+        $barrio = Barrio::all(); // Saca con el servicio relacionado de la base de datos
         $data = array(
             'code' => 200,
             'status' => 'success',
-            'evento' => $evento
+            'barrio' => $barrio
         );
         return response()->json($data, $data['code']);
     }
@@ -43,10 +43,8 @@ class EventoController extends Controller
 
         // 2.-Validar datos
         $validate = Validator::make($request->all(), [
-            'evento' => 'required|unique:eventos',
+            'nombre' => 'required|unique:barrios',
             'descripcion' => 'required',
-            'precio' => 'required',
-            'tiempo_event' => 'required',
         ]);
 
         // Comprobar si los datos son validos
@@ -62,22 +60,20 @@ class EventoController extends Controller
         } else {
             // Si la validacion pasa correctamente
             // Crear el objeto usuario para guardar en la base de datos
-            $evento = new Evento();
-            $evento->evento = $params->evento;
-            $evento->descripcion = $params->descripcion;
-            $evento->precio = $params->precio;
-            $evento->tiempo_event = $params->tiempo_event;
+            $barrio = new Barrio();
+            $barrio->nombre = $params->nombre;
+            $barrio->descripcion = $params->descripcion;
 
             try {
                 // Guardar en la base de datos
 
                 // 5.-Crear el usuario
-                $evento->save();
+                $barrio->save();
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
-                    'message' => 'El evento se ha creado correctamente',
-                    'evento'  => $evento
+                    'message' => 'El barrio se ha creado correctamente',
+                    'barrio'  => $barrio
                 );
             } catch (Exception $e) {
                 $data = array(
@@ -101,20 +97,20 @@ class EventoController extends Controller
      */
     public function show($id)
     {
-        $evento = Evento::find($id);
+        $barrio = Barrio::find($id);
 
         // Comprobamos si es un objeto eso quiere decir si exist en la base de datos.
-        if (is_object($evento)) {
+        if (is_object($barrio)) {
             $data = array(
                 'code' => 200,
                 'status' => 'success',
-                'evento' => $evento
+                'barrio' => $barrio
             );
         } else {
             $data = array(
                 'code' => 404,
                 'status' => 'error',
-                'message' => 'El evento no existe'
+                'message' => 'El barrio no existe.'
             );
         }
         return response()->json($data, $data['code']);
@@ -131,20 +127,19 @@ class EventoController extends Controller
     {
 
         // Validar carnet UNIQUE en una actualización
-        $evento = Evento::find($id);
+        $barrio = Barrio::find($id);
 
-        if (!empty($evento)) {
+        if (!empty($barrio)) {
+
 
             // para actualizar unique
-            $datoEvento = $evento->evento;
+            $datoBarrio = $barrio->nombre;
 
             // 1.- Validar datos recogidos por POST. pasando al getIdentity true
             $validate = Validator::make($request->all(), [
 
-                'evento' => 'required',
+                'nombre' => 'required',
                 'descripcion' => 'required',
-                'precio' => 'required',
-                'tiempo_event' => 'required',
                 'estado' => 'required'
 
             ]);
@@ -166,8 +161,8 @@ class EventoController extends Controller
             } else {
 
 
-                if ($datoEvento == $paramsArray['evento']) {
-                    unset($paramsArray['evento']);
+                if ($datoBarrio == $paramsArray['nombre']) {
+                    unset($paramsArray['nombre']);
                 }
 
                 // 4.- Quitar los campos que no quiero actualizar de la peticion.
@@ -177,7 +172,7 @@ class EventoController extends Controller
 
                 try {
                     // 5.- Actualizar los datos en la base de datos.
-                    Evento::where('id', $id)->update($paramsArray);
+                    Barrio::where('id', $id)->update($paramsArray);
 
                     // var_dump($user_update);
                     // die();
@@ -185,8 +180,8 @@ class EventoController extends Controller
                     $data = array(
                         'status' => 'Succes',
                         'code' => 200,
-                        'message' => 'El evento se ha modificado correctamente',
-                        'evento' => $evento,
+                        'message' => 'El barrio se ha modificado correctamente',
+                        'barrio' => $barrio,
                         'changes' => $paramsArray
                     );
                 } catch (Exception $e) {
@@ -204,7 +199,7 @@ class EventoController extends Controller
             $data = array(
                 'status' => 'error',
                 'code' => 400,
-                'message' => 'Este evento no existe.',
+                'message' => 'Este nombre de barrio no existe.',
                 // 'error' => $e
             );
             return response()->json($data, $data['code']);
@@ -219,21 +214,19 @@ class EventoController extends Controller
      */
     public function destroy($id)
     {
-        $evento = Evento::find($id); // Trae el usuario en formato JSON
+        $barrio = Barrio::find($id); // Trae el usuario en formato JSON
 
         // echo $user->estado;
         // die();
 
-        if (!empty($evento)) {
-            $paramsArray = json_decode($evento, true); // devuelve un array
+        if (!empty($barrio)) {
+            $paramsArray = json_decode($barrio, true); // devuelve un array
             // var_dump($paramsArray);
             // die();
 
             // Quitar los campos que no quiero actualizar de la peticion.
-            unset($paramsArray['evento']);
+            unset($paramsArray['nombre']);
             unset($paramsArray['descripcion']);
-            unset($paramsArray['precio']);
-            unset($paramsArray['tiempo_event']);
             unset($paramsArray['created_at']);
             unset($paramsArray['updated_at']);
 
@@ -242,21 +235,21 @@ class EventoController extends Controller
 
             try {
                 // 5.- Actualizar los datos en la base de datos.
-                Evento::where('id', $id)->update($paramsArray);
+                Barrio::where('id', $id)->update($paramsArray);
 
                 // 6.- Devolver el array con el resultado.
                 $data = array(
                     'status' => 'Succes',
                     'code' => 200,
-                    'message' => 'El evento ha sido dado de baja correctamente',
-                    'evento' => $evento,
+                    'message' => 'Este nombre de barrio ha sido dado de baja correctamente',
+                    'barrio' => $barrio,
                     'changes' => $paramsArray
                 );
             } catch (Exception $e) {
                 $data = array(
                     'status' => 'error',
                     'code' => 400,
-                    'message' => 'El evento no ha sido dado de baja',
+                    'message' => 'Este nombre de barrio no ha sido dado de baja',
                     'error' => $e
                 );
             }
@@ -265,7 +258,7 @@ class EventoController extends Controller
             $data = array(
                 'status' => 'error',
                 'code' => 400,
-                'message' => 'Este evento no existe.',
+                'message' => 'Este barrio no existe.',
             );
             return response()->json($data, $data['code']);
         }

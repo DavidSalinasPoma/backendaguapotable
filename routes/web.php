@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\BarrioController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\PruebasController;
+use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SocioController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UsuarioController;
@@ -91,6 +93,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/api/empleado', EmpleadoController::class);
 
     /*************RUTAS PARA EVENTOS********/
-    // Utilizando rutas automatica empleado 
+    // Utilizando rutas automatica evento 
     Route::resource('/api/evento', EventoController::class);
+
+    /*************RUTAS PARA Servicios********/
+    // Utilizando rutas automatica servicio 
+    Route::resource('/api/servicio', ServicioController::class);
+
+    /*************RUTAS PARA Barrio********/
+    // Utilizando rutas automatica Barrio 
+    Route::resource('/api/barrio', BarrioController::class);
 });

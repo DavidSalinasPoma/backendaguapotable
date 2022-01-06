@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSociosTable extends Migration
+class CreateServiciosTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,12 @@ class CreateSociosTable extends Migration
      */
     public function up()
     {
-        Schema::create('socios', function (Blueprint $table) {
+        Schema::create('servicios', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
-            $table->foreignId('persona_id')->constrained('personas')->onUpdate('cascade')->onDelete('restrict');
-            $table->foreignId('barrio_id')->constrained('barrios')->onUpdate('cascade')->onDelete('restrict');
+            $table->string('nombre')->unique();
+            $table->string('descripcion');
+            $table->double('costo');
             $table->integer('estado')->default(1);
             $table->timestamps();
         });
@@ -30,6 +31,6 @@ class CreateSociosTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('socios');
+        Schema::dropIfExists('servicios');
     }
 }

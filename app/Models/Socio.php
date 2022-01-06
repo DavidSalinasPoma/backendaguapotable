@@ -19,4 +19,10 @@ class Socio extends Model
     {
         return $this->belongsTo('App\Models\Persona', 'persona_id'); // Recibe a Persona
     }
+
+    // relacion de muchos a uno inversa(muchos a uno)
+    public function barrio()
+    {
+        return $this->belongsTo('App\Models\Barrio', 'barrio_id'); // Recibe a Persona
+    }
 }

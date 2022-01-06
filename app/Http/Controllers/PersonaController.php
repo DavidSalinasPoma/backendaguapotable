@@ -153,80 +153,92 @@ class PersonaController extends Controller
         // Validar carnet UNIQUE en una actualización
         $persona = Persona::find($id);
 
-        $carnet = $persona->carnet;
 
-        // Actualizar Usuario.
-        // 1.- Validar datos recogidos por POST. pasando al getIdentity true
-        $validate = Validator::make($request->all(), [
-            // Validar lo que se va actualizar
-            'carnet' => 'required',
-            'expedito' => 'required',
-            'nombres' => 'required',
-            'ap_paterno' => 'required',
-            'ap_materno' => 'required',
-            'sexo' => 'required',
-            'direccion' => 'required',
-            'email' => 'required|email',
-            'celular' => 'required',
-            'celular_familiar' => 'required',
-            'nacimiento' => 'required',
-            'estado_civil' => 'required',
-            'estado' => 'required',
+        if (!empty($persona)) {
 
-        ]);
+            $carnet = $persona->carnet;
 
-        // 2.-Recoger los usuarios por post
-        $params = (object) $request->all(); // Devuelve un obejto
-        $paramsArray = $request->all(); // Es un array
+            // Actualizar Usuario.
+            // 1.- Validar datos recogidos por POST. pasando al getIdentity true
+            $validate = Validator::make($request->all(), [
+                // Validar lo que se va actualizar
+                'carnet' => 'required',
+                'expedito' => 'required',
+                'nombres' => 'required',
+                'ap_paterno' => 'required',
+                'ap_materno' => 'required',
+                'sexo' => 'required',
+                'direccion' => 'required',
+                'email' => 'required|email',
+                'celular' => 'required',
+                'celular_familiar' => 'required',
+                'nacimiento' => 'required',
+                'estado_civil' => 'required',
+                'estado' => 'required',
 
-        // // Comprobar si los datos son validos
-        if ($validate->fails()) { // en caso si los datos fallan la validacion
-            // La validacion ha fallado
-            $data = array(
-                'status' => 'Error',
-                'code' => 400,
-                'message' => 'Datos incorrectos no se puede actualizar',
-                'errors' => $validate->errors()
-            );
-        } else {
-            // echo $carnet;
-            // echo $paramsArray['carnet'];
-            // die();
-            if ($carnet == $paramsArray['carnet']) {
-                unset($paramsArray['carnet']);
-            }
+            ]);
 
-            // 4.- Quitar los campos que no quiero actualizar de la peticion.
-            // unset($paramsArray['id']);
-            // unset($paramsArray['password']);
-            // // unset($paramsArray['antiguo']);
-            unset($paramsArray['created_at']);
-            // unset($paramsArray['updated_at']);
+            // 2.-Recoger los usuarios por post
+            $params = (object) $request->all(); // Devuelve un obejto
+            $paramsArray = $request->all(); // Es un array
 
-            try {
-                // 5.- Actualizar los datos en la base de datos.
-                Persona::where('id', $id)->update($paramsArray);
-
-                // 6.- Devolver el array con el resultado.
+            // // Comprobar si los datos son validos
+            if ($validate->fails()) { // en caso si los datos fallan la validacion
+                // La validacion ha fallado
                 $data = array(
-                    'status' => 'Succes',
-                    'code' => 200,
-                    'message' => 'La persona se ha modificado correctamente',
-                    'persona' => $persona,
-                    'changes' => $paramsArray
-                );
-            } catch (Exception $e) {
-                $data = array(
-                    'status' => 'error',
+                    'status' => 'Error',
                     'code' => 400,
-                    'message' => 'No se hizo la modificación, Este registro con numero de carnet ya existe',
-                    'error' => $e
+                    'message' => 'Datos incorrectos no se puede actualizar',
+                    'errors' => $validate->errors()
                 );
+            } else {
+                // echo $carnet;
+                // echo $paramsArray['carnet'];
+                // die();
+                if ($carnet == $paramsArray['carnet']) {
+                    unset($paramsArray['carnet']);
+                }
+
+                // 4.- Quitar los campos que no quiero actualizar de la peticion.
+                // unset($paramsArray['id']);
+                // unset($paramsArray['password']);
+                // // unset($paramsArray['antiguo']);
+                unset($paramsArray['created_at']);
+                // unset($paramsArray['updated_at']);
+
+                try {
+                    // 5.- Actualizar los datos en la base de datos.
+                    Persona::where('id', $id)->update($paramsArray);
+
+                    // 6.- Devolver el array con el resultado.
+                    $data = array(
+                        'status' => 'Succes',
+                        'code' => 200,
+                        'message' => 'La persona se ha modificado correctamente',
+                        'persona' => $persona,
+                        'changes' => $paramsArray
+                    );
+                } catch (Exception $e) {
+                    $data = array(
+                        'status' => 'error',
+                        'code' => 400,
+                        'message' => 'No se hizo la modificación, Este registro con numero de carnet ya existe',
+                        'error' => $e
+                    );
+                }
             }
+
+
+            return response()->json($data, $data['code']);
+        } else {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Esta persona no existe.',
+                // 'error' => $e
+            );
+            return response()->json($data, $data['code']);
         }
-
-
-        return response()->json($data, $data['code']);
     }
 
     /**
