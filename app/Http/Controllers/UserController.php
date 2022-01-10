@@ -4,13 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\user\BuscarUsuarioRequest;
+use App\Http\Requests\User\LogoutRequest;
 use App\Http\Requests\User\UpdateRequest;
+use App\Models\Persona;
 use App\Models\User;
+use App\Models\Usuario;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
+use phpDocumentor\Reflection\DocBlock\Tags\Var_;
 
 class UserController extends Controller
 {
@@ -21,11 +27,32 @@ class UserController extends Controller
      */
     public function index()
     {
-        $user = User::all(); // Saca con el usuario relacionado de la base de datos
+
+        // $Cliente = Cliente::with('sector_pk', 'sectorLanguage_pk')
+        // ->where('active', '=', 1)
+        // ->get();
+        $userPersona = User::orderBy('id', 'DESC')->paginate(5)->load('persona');
+        $user = User::orderBy('id', 'DESC')->paginate(5);
+        $total = User::count();
+
+        // echo $userPersona;
+        // die();
+
         $data = array(
             'code' => 200,
             'status' => 'success',
-            'usuario' => $user
+            'total' => $total,
+            'paginate' => [
+                "total" => $user->total(),
+                "current_page" => $user->currentPage(),
+                "per_page" => $user->perPage(),
+                "last_page" => $user->lastPage(),
+                "from" => $user->firstItem(),
+                "to" => $user->lastPage(),
+            ],
+            'usuario' => $userPersona,
+            'user' => $user
+
         );
         return response()->json($data, $data['code']);
     }
@@ -217,8 +244,6 @@ class UserController extends Controller
 
         $params = (object) $request->all(); // Devulve un obejto
 
-
-
         // 2.-Validar datos
         $validate = Validator::make($request->all(), [
             'persona_id' => 'required',
@@ -327,7 +352,7 @@ class UserController extends Controller
     }
 
     // Para cerrar sesion
-    public function logout(Request $request)
+    public function logout(LogoutRequest $request)
     {
         $request->user()->currentAccessToken()->delete();
         $data = array(
@@ -335,6 +360,41 @@ class UserController extends Controller
             'code' => 200,
             'message' => 'Token Eliminado Correctamente',
         );
+        // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
+    }
+
+
+    // Buscar Usuario
+    public function buscarUsuario(BuscarUsuarioRequest $request)
+    {
+        $params = (object) $request->all(); // Devuelve un obejto
+        $paramsArray = $request->all(); // Es un array
+
+        $texto = trim($params->texto);
+
+
+        $resultado = DB::table('users')
+            ->join('personas', 'users.persona_id', '=', 'personas.id')
+            // ->where('email', 'LIKE', "%$texto%")
+            // ->orWhere('estado', 'LIKE', "%$texto%")
+            ->select("users.id", "users.created_at", "users.email", "users.estado", "users.persona_id", "personas.nombres", "personas.ap_paterno", "personas.ap_materno")
+            ->where('users.estado', 'like', "%$texto%")
+            ->orWhere('users.email', 'like', "%$texto%")
+            ->orWhere('personas.carnet', 'like', "%$texto%")
+            ->orWhere('personas.ap_paterno', 'like', "%$texto%")
+            ->orWhere('personas.ap_materno', 'like', "%$texto%")
+            ->paginate(5);
+
+
+
+
+        $data = array(
+            'status' => 'success',
+            'code' => 200,
+            'data' => $resultado
+        );
+
         // Devuelve en json con laravel
         return response()->json($data, $data['code']);
     }

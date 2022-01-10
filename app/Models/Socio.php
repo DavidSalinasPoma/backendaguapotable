@@ -23,6 +23,13 @@ class Socio extends Model
     // relacion de muchos a uno inversa(muchos a uno)
     public function barrio()
     {
-        return $this->belongsTo('App\Models\Barrio', 'barrio_id'); // Recibe a Persona
+        return $this->belongsTo('App\Models\Barrio', 'barrio_id'); // Recibe a Barrio
+    }
+
+    // Para sacar todos los consumos q esten relacionados con socios
+    // es una relacion de UNO a MUCHOS
+    public function consumo()
+    {
+        return $this->hasMany('App\Models\Consumo'); // se dirige hacia Consumos
     }
 }

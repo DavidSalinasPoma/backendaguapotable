@@ -5,6 +5,7 @@ use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\PruebasController;
+use App\Http\Controllers\RenewController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SocioController;
 use App\Http\Controllers\UserController;
@@ -73,11 +74,16 @@ Route::post('/api/login', [UserController::class, 'login']);
 // Grupo de rutas que necesitan el token
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
+    /*************VERIFICAR TOKEN CON EL GUARD DE ANGULAR********/
+    // Utilizando rutas automatica Barrio 
+    Route::get('/api/login/renew', [RenewController::class, 'renew']);
+
     // /*************RUTAS PARA USUARIOS********/
     // Utilizando rutas automatica usuario 
     Route::resource('/api/user', UserController::class);
-    // Ruta para cerrar sesion o eliminar un token
-    Route::post('/api/logout', [UserController::class, 'logout']);
+
+    // Buscar Usuario
+    Route::post('/api/buscar/usuario', [UserController::class, 'buscarUsuario']);
 
 
     /*************RUTAS PARA PERSONAS********/
@@ -103,4 +109,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /*************RUTAS PARA Barrio********/
     // Utilizando rutas automatica Barrio 
     Route::resource('/api/barrio', BarrioController::class);
+
+    // Ruta para cerrar sesion o eliminar un token
+    Route::post('/api/logout', [UserController::class, 'logout']);
 });
