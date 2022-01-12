@@ -325,7 +325,7 @@ class UserController extends Controller
         } else {
 
 
-            $user = User::where('email', $request->email)->first();
+            $user = User::with('persona')->where('email', $request->email)->first();
 
             if (!$user || !Hash::check($request->password, $user->password)) {
 
@@ -344,7 +344,8 @@ class UserController extends Controller
                 'status' => 'success',
                 'code' => 200,
                 'message' => 'Credenciales correctas',
-                'token' => $token
+                'token' => $token,
+                'users' => $user
             );
         }
         // Devuelve en json con laravel
@@ -369,10 +370,7 @@ class UserController extends Controller
     public function buscarUsuario(BuscarUsuarioRequest $request)
     {
         $params = (object) $request->all(); // Devuelve un obejto
-        $paramsArray = $request->all(); // Es un array
-
-        $texto = trim($params->texto);
-
+        $texto = trim($params->textos);
 
         $resultado = DB::table('users')
             ->join('personas', 'users.persona_id', '=', 'personas.id')
@@ -382,17 +380,15 @@ class UserController extends Controller
             ->where('users.estado', 'like', "%$texto%")
             ->orWhere('users.email', 'like', "%$texto%")
             ->orWhere('personas.carnet', 'like', "%$texto%")
+            ->orWhere('personas.nombres', 'like', "%$texto%")
             ->orWhere('personas.ap_paterno', 'like', "%$texto%")
             ->orWhere('personas.ap_materno', 'like', "%$texto%")
             ->paginate(5);
 
-
-
-
         $data = array(
             'status' => 'success',
             'code' => 200,
-            'data' => $resultado
+            'user' => $resultado
         );
 
         // Devuelve en json con laravel
