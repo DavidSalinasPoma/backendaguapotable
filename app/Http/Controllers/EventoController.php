@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\evento\BuscarEventoRequest;
 use App\Http\Requests\evento\StoreRequest;
 use App\Http\Requests\evento\UpdateRequest;
 use App\Models\Evento;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class EventoController extends Controller
@@ -18,7 +20,9 @@ class EventoController extends Controller
      */
     public function index()
     {
-        $evento = Evento::all(); // Saca con el usuario relacionado de la base de datos
+
+        $evento = Evento::orderBy('id', 'DESC')->paginate(5);
+
         $data = array(
             'code' => 200,
             'status' => 'success',
@@ -269,5 +273,29 @@ class EventoController extends Controller
             );
             return response()->json($data, $data['code']);
         }
+    }
+
+    // Buscar Usuario
+    public function buscarEvento(BuscarEventoRequest $request)
+    {
+        $params = (object) $request->all(); // Devuelve un obejto
+        $texto = trim($params->textos);
+
+        $resultado = DB::table('eventos')
+            ->select("eventos.id", "eventos.evento", "eventos.descripcion", "eventos.estado")
+            ->where('eventos.id', 'like', "%$texto%")
+            ->orWhere('eventos.evento', 'like', "%$texto%")
+            ->orWhere('eventos.descripcion', 'like', "%$texto%")
+            ->orWhere('eventos.estado', 'like', "%$texto%")
+            ->paginate(5);
+
+        $data = array(
+            'status' => 'success',
+            'code' => 200,
+            'evento' => $resultado
+        );
+
+        // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
     }
 }

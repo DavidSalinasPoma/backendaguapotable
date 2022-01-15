@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Persona;
 use App\Helpers\JwtAuth;
+use App\Http\Requests\Persona\BuscarPersonaRequest;
 use App\Http\Requests\Persona\StoreRequest;
 use App\Http\Requests\Persona\UpdateRequest;
 use App\Policies\PersonaPolicy;
 use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class PersonaController extends Controller
@@ -30,7 +32,9 @@ class PersonaController extends Controller
      */
     public function index()
     {
-        $persona = Persona::all(); // Saca con el usuario relacionado de la base de datos
+        $persona = Persona::where('estado', '=', 1)
+            ->orderBy('id', 'desc')
+            ->paginate(5); // Saca con el usuario relacionado de la base de datos
         $data = array(
             'code' => 200,
             'status' => 'success',
@@ -156,6 +160,7 @@ class PersonaController extends Controller
 
         if (!empty($persona)) {
 
+            // llaves unicas
             $carnet = $persona->carnet;
 
             // Actualizar Usuario.
@@ -284,5 +289,31 @@ class PersonaController extends Controller
     public function pruebas(Request $request)
     {
         return "Acción de pruebas de PERSONA-CONTROLLER";
+    }
+
+    // Buscar Usuario
+    public function buscarPersona(BuscarPersonaRequest $request)
+    {
+        $params = (object) $request->all(); // Devuelve un obejto
+        $texto = trim($params->textos);
+
+        $resultado = DB::table('personas')
+            ->select("personas.id", "personas.nombres", "personas.carnet", "personas.ap_paterno", "personas.ap_materno", "personas.celular", "personas.estado")
+            ->where('personas.id', 'like', "%$texto%")
+            ->orWhere('personas.carnet', 'like', "%$texto%")
+            ->orWhere('personas.nombres', 'like', "%$texto%")
+            ->orWhere('personas.ap_paterno', 'like', "%$texto%")
+            ->orWhere('personas.ap_materno', 'like', "%$texto%")
+            ->orWhere('personas.celular', 'like', "%$texto%")
+            ->paginate(5);
+
+        $data = array(
+            'status' => 'success',
+            'code' => 200,
+            'persona' => $resultado
+        );
+
+        // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
     }
 }

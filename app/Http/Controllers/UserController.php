@@ -65,7 +65,7 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        $usuario = User::find($id);
+        $usuario = User::with('persona')->find($id);
 
         // Comprobamos si es un objeto eso quiere decir si exist en la base de datos.
         if (is_object($usuario)) {
@@ -102,6 +102,9 @@ class UserController extends Controller
 
         if (!empty($user)) {
 
+            // llaves unicas
+            $email = $user->email;
+
             // 1.- Validar datos recogidos por POST. pasando al getIdentity true
             $validate = Validator::make($request->all(), [
 
@@ -129,16 +132,31 @@ class UserController extends Controller
                     'errors' => $validate->errors()
                 );
             } else {
+                // echo $paramsArray['password'];
+                // die();
 
                 // 4.- Quitar los campos que no quiero actualizar de la peticion.
                 // unset($paramsArray['id']);
-                // unset($paramsArray['password']);
+                if ($paramsArray['password'] == 'Ingrese nueva contraseña') {
+                    unset($paramsArray['password']);
+
+                    // echo 'hola1';
+                } else {
+                    // 3.- Cifrar la PASSWORD.
+                    // 3.-Cifrar la contraseña
+                    $pwd = bcrypt($params->password); // se cifra la contraseña 4 veces
+                    $paramsArray['password'] = $pwd;
+                    // echo 'hola2';
+                }
+                if ($email == $paramsArray['email']) {
+                    unset($paramsArray['email']);
+                }
                 // // unset($paramsArray['antiguo']);
                 unset($paramsArray['created_at']);
                 // unset($paramsArray['updated_at']);
 
-                // 3.- Cifrar la PASSWORD.
-                // $paramsArray['password'] = hash('sha256', $paramsArray['password']); // para verificar que las contraseña a consultar sean iguales.
+
+
                 try {
                     // 5.- Actualizar los datos en la base de datos.
                     User::where('id', $id)->update($paramsArray);
@@ -158,7 +176,7 @@ class UserController extends Controller
                         'status' => 'error',
                         'code' => 400,
                         'message' => 'El nombre de usuario ya esta en uso.',
-                        // 'error' => $e
+                        'error' => $user
                     );
                 }
             }

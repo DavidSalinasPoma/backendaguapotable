@@ -89,6 +89,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /*************RUTAS PARA PERSONAS********/
     // Utilizando rutas automatica usuario 
     Route::resource('/api/persona', PersonaController::class);
+    // Buscar Personas
+    Route::post('/api/buscar/personas', [PersonaController::class, 'buscarPersona']);
 
     /*************RUTAS PARA SOCIOS********/
     // Utilizando rutas automatica socio
@@ -101,6 +103,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /*************RUTAS PARA EVENTOS********/
     // Utilizando rutas automatica evento 
     Route::resource('/api/evento', EventoController::class);
+    // Buscar Personas
+    Route::post('/api/buscar/eventos', [EventoController::class, 'buscarEvento']);
 
     /*************RUTAS PARA Servicios********/
     // Utilizando rutas automatica servicio 
