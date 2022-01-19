@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\servicio\BuscarServicioRequest;
 use App\Http\Requests\servicio\StoreRequest;
 use App\Http\Requests\servicio\UpdateRequest;
 use App\Models\Servicio;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ServicioController extends Controller
@@ -18,7 +20,9 @@ class ServicioController extends Controller
      */
     public function index()
     {
-        $servicio = Servicio::all(); // Saca con el servicio relacionado de la base de datos
+
+        $servicio = Servicio::orderBy('id', 'DESC')->paginate(5);
+
         $data = array(
             'code' => 200,
             'status' => 'success',
@@ -265,5 +269,28 @@ class ServicioController extends Controller
             );
             return response()->json($data, $data['code']);
         }
+    }
+
+    // Buscar Usuario
+    public function buscarServicio(BuscarServicioRequest $request)
+    {
+        $params = (object) $request->all(); // Devuelve un obejto
+        $texto = trim($params->textos);
+
+        $resultado = DB::table('servicios')
+            ->select("servicios.id", "servicios.nombre", "servicios.descripcion", "servicios.estado")
+            ->where('servicios.id', 'like', "%$texto%")
+            ->orWhere('servicios.nombre', 'like', "%$texto%")
+            ->orWhere('servicios.descripcion', 'like', "%$texto%")
+            ->orWhere('servicios.estado', 'like', "%$texto%")
+            ->paginate(5);
+        $data = array(
+            'status' => 'success',
+            'code' => 200,
+            'servicio' => $resultado
+        );
+
+        // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
     }
 }

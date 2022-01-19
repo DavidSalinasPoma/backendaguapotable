@@ -109,10 +109,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /*************RUTAS PARA Servicios********/
     // Utilizando rutas automatica servicio 
     Route::resource('/api/servicio', ServicioController::class);
+    // Buscar Personas
+    Route::post('/api/buscar/servicios', [ServicioController::class, 'buscarServicio']);
 
     /*************RUTAS PARA Barrio********/
     // Utilizando rutas automatica Barrio 
     Route::resource('/api/barrio', BarrioController::class);
+    // Buscar barrios
+    Route::post('/api/buscar/barrios', [BarrioController::class, 'buscarBarrios']);
 
     // Ruta para cerrar sesion o eliminar un token
     Route::post('/api/logout', [UserController::class, 'logout']);

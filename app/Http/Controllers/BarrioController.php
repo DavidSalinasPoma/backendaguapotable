@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\barrio\StoreRequest;
 use App\Http\Requests\barrio\UpdateRequest;
+use App\Http\Requests\servicio\BuscarServicioRequest;
 use App\Models\Barrio;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class BarrioController extends Controller
@@ -18,7 +20,9 @@ class BarrioController extends Controller
      */
     public function index()
     {
-        $barrio = Barrio::all(); // Saca con el servicio relacionado de la base de datos
+
+        $barrio = Barrio::orderBy('id', 'DESC')->paginate(5);
+
         $data = array(
             'code' => 200,
             'status' => 'success',
@@ -53,8 +57,8 @@ class BarrioController extends Controller
             $data = array(
                 'status' => 'Error',
                 'code' => 400,
-                'message' => 'Los datos enviados no son correctos',
-                'evento' => $request->all(),
+                'message' => 'Los datos enviados no son correctos ó el barrio ya existe!',
+                'barrio' => $request->all(),
                 'errors' => $validate->errors()
             );
         } else {
@@ -262,5 +266,28 @@ class BarrioController extends Controller
             );
             return response()->json($data, $data['code']);
         }
+    }
+
+    // Buscar Barrios
+    public function buscarBarrios(BuscarServicioRequest $request)
+    {
+        $params = (object) $request->all(); // Devuelve un obejto
+        $texto = trim($params->textos);
+
+        $resultado = DB::table('barrios')
+            ->select("barrios.id", "barrios.nombre", "barrios.descripcion", "barrios.estado")
+            ->where('barrios.id', 'like', "%$texto%")
+            ->orWhere('barrios.nombre', 'like', "%$texto%")
+            ->orWhere('barrios.descripcion', 'like', "%$texto%")
+            ->orWhere('barrios.estado', 'like', "%$texto%")
+            ->paginate(5);
+        $data = array(
+            'status' => 'success',
+            'code' => 200,
+            'barrio' => $resultado
+        );
+
+        // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
     }
 }
