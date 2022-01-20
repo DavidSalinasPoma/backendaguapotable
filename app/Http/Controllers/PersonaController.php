@@ -32,9 +32,9 @@ class PersonaController extends Controller
      */
     public function index()
     {
-        $persona = Persona::where('estado', '=', 1)
-            ->orderBy('id', 'desc')
-            ->paginate(5); // Saca con el usuario relacionado de la base de datos
+
+        $persona = Persona::orderBy('id', 'DESC')->paginate(5);
+
         $data = array(
             'code' => 200,
             'status' => 'success',
@@ -292,7 +292,7 @@ class PersonaController extends Controller
     }
 
     // Buscar Usuario
-    public function buscarPersona(BuscarPersonaRequest $request)
+    public function buscarPersonas(BuscarPersonaRequest $request)
     {
         $params = (object) $request->all(); // Devuelve un obejto
         $texto = trim($params->textos);

@@ -90,7 +90,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Utilizando rutas automatica usuario 
     Route::resource('/api/persona', PersonaController::class);
     // Buscar Personas
-    Route::post('/api/buscar/personas', [PersonaController::class, 'buscarPersona']);
+    Route::post('/api/buscar/personas', [PersonaController::class, 'buscarPersonas']);
 
     /*************RUTAS PARA SOCIOS********/
     // Utilizando rutas automatica socio
