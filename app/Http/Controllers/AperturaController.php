@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\apertura\StoreRequest;
 use App\Http\Requests\apertura\UpdateRequest;
 use App\Models\Apertura;
+use App\Models\Lista;
+use App\Models\Persona;
+use App\Models\Socio;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -39,14 +42,9 @@ class AperturaController extends Controller
 
         $params = (object) $request->all(); // Devulve un obejto
 
-
-
         // 2.-Validar datos
         $validate = Validator::make($request->all(), [
-            'año' => 'required',
             'mes' => 'required',
-            'fecha_pago_ini' => 'required',
-            'fecha_pago_final' => 'required',
         ]);
 
         // Comprobar si los datos son validos
@@ -63,16 +61,24 @@ class AperturaController extends Controller
             // Si la validacion pasa correctamente
             // Crear el objeto usuario para guardar en la base de datos
             $apertura = new Apertura();
-            $apertura->año = $params->año;
             $apertura->mes = $params->mes;
-            $apertura->fecha_pago_ini = $params->fecha_pago_ini;
-            $apertura->fecha_pago_final = $params->fecha_pago_final;
 
             try {
                 // Guardar en la base de datos
 
                 // 5.-Crear el usuario
                 $apertura->save();
+
+                // logica carga de lista
+                $socio = Socio::all()->load('persona');
+
+                foreach ($socio as $key => $item) {
+                    $lista = new Lista();
+                    $lista->socio_id = $item->id;
+                    $lista->apertura_id = $apertura->id;
+                    $lista->save();
+                }
+
                 $data = array(
                     'status' => 'success',
                     'code' => 200,

@@ -32,4 +32,10 @@ class Socio extends Model
     {
         return $this->hasMany('App\Models\Consumo'); // se dirige hacia Consumos
     }
+
+    // Se dirige hacia lista
+    public function lista()
+    {
+        return $this->hasMany('App\Models\Lista'); // se dirige hacia Lista
+    }
 }

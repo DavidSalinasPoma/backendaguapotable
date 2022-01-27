@@ -298,7 +298,7 @@ class PersonaController extends Controller
         $texto = trim($params->textos);
 
         $resultado = DB::table('personas')
-            ->select("personas.id", "personas.nombres", "personas.carnet", "personas.ap_paterno", "personas.ap_materno", "personas.celular", "personas.estado")
+            ->select("personas.id", "personas.nombres", "personas.carnet", "personas.ap_paterno", "personas.ap_materno", "personas.celular", "personas.estado", "personas.socio")
             ->where('personas.id', 'like', "%$texto%")
             ->orWhere('personas.carnet', 'like', "%$texto%")
             ->orWhere('personas.nombres', 'like', "%$texto%")

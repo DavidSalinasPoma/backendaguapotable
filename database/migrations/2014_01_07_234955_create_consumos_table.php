@@ -20,11 +20,11 @@ class CreateConsumosTable extends Migration
             $table->bigInteger('lecturaActual');
             $table->bigInteger('consumo');
             $table->double('precio');
-            $table->string('imagen');
-            $table->string('observaciones');
+            $table->string('mes');
+            $table->string('anio');
             $table->foreignId('socio_id')->constrained('socios')->onUpdate('cascade')->onDelete('restrict');
             $table->foreignId('apertura_id')->constrained('aperturas')->onUpdate('cascade')->onDelete('restrict');
-
+            $table->integer('estado')->default(1);
             $table->timestamps();
         });
     }

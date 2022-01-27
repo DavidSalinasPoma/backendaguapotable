@@ -30,6 +30,7 @@ class CreatePersonasTable extends Migration
             $table->string('nacimiento');
             $table->string('estado_civil');
             $table->string('estado')->default(1);
+            $table->string('socio')->default(0);
             $table->timestamps();
         });
     }

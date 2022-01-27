@@ -20,4 +20,9 @@ class Apertura extends Model
     {
         return $this->hasMany('App\Models\Consumo'); // se dirige hacia Consumos
     }
+
+    public function lista()
+    {
+        return $this->hasMany('App\Models\Lista'); // se dirige hacia Lista
+    }
 }

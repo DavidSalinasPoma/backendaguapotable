@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\AperturaController;
 use App\Http\Controllers\BarrioController;
+use App\Http\Controllers\ConsumoController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\EventoController;
+use App\Http\Controllers\ListaController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\PruebasController;
 use App\Http\Controllers\RenewController;
@@ -95,6 +98,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /*************RUTAS PARA SOCIOS********/
     // Utilizando rutas automatica socio
     Route::resource('/api/socio', SocioController::class);
+    // Buscar Socios
+    Route::post('/api/buscar/socios', [SocioController::class, 'buscarSocios']);
 
     /*************RUTAS PARA EMPLEADOS********/
     // Utilizando rutas automatica empleado 
@@ -117,6 +122,23 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/api/barrio', BarrioController::class);
     // Buscar barrios
     Route::post('/api/buscar/barrios', [BarrioController::class, 'buscarBarrios']);
+
+    /*************RUTAS PARA APERTURAS********/
+    // Utilizando rutas automatica aperturas 
+    Route::resource('/api/apertura', AperturaController::class);
+
+    /*************RUTAS PARA LISTAR SOCIOS********/
+    // Utilizando rutas automatica aperturas 
+    Route::resource('/api/lista', ListaController::class);
+    // Buscar listas
+    Route::post('/api/buscar/listas', [ListaController::class, 'buscarSocios']);
+
+    /*************RUTAS PARA CONSUMO********/
+    // Utilizando rutas automatica aperturas 
+    Route::resource('/api/consumo', ConsumoController::class);
+    // Buscar Consumo
+    Route::post('/api/desplegar/consumos', [ConsumoController::class, 'showConsumos']);
+    Route::post('/api/desplegar/precios', [ConsumoController::class, 'preciosConsumos']);
 
     // Ruta para cerrar sesion o eliminar un token
     Route::post('/api/logout', [UserController::class, 'logout']);

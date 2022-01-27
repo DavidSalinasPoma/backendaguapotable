@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\socio\BuscarSocioRequest;
 use App\Http\Requests\socio\StoreRequest;
 use App\Http\Requests\socio\UpdateRequest;
+use App\Models\Persona;
 use App\Models\Socio;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class SocioController extends Controller
@@ -18,7 +21,10 @@ class SocioController extends Controller
      */
     public function index()
     {
-        $socio = Socio::all(); // Saca con el usuario relacionado de la base de datos
+
+        // 1.-Persona el la funcion que esta en el Modelo de soscio
+        $socio = Socio::with('persona', 'barrio')->orderBy('id', 'DESC')->paginate(5);
+
         $data = array(
             'code' => 200,
             'status' => 'success',
@@ -44,6 +50,7 @@ class SocioController extends Controller
         // 2.-Validar datos
         $validate = Validator::make($request->all(), [
             'persona_id' => 'required',
+            'barrio_id' => 'required',
         ]);
 
         // Comprobar si los datos son validos
@@ -61,12 +68,19 @@ class SocioController extends Controller
             // Crear el objeto usuario para guardar en la base de datos
             $socio = new Socio();
             $socio->persona_id = $params->persona_id;
+            $socio->barrio_id = $params->barrio_id;
 
             try {
                 // Guardar en la base de datos
 
                 // 5.-Crear el usuario
                 $socio->save();
+                $paramsArray = array(
+                    'socio' => 1
+                );
+                // 5.- Actualizar los datos de la persona que ya es socio
+                Persona::where('id', $params->persona_id)->update($paramsArray);
+
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
@@ -95,22 +109,21 @@ class SocioController extends Controller
      */
     public function show($id)
     {
-        $socio = Socio::find($id);
+        // 1.-Persona el la funcion que esta en el Modelo de soscio
+        $lista = DB::table('listas')
+            ->join('socios', 'listas.socio_id', '=', 'socios.id')
+            ->join('aperturas', 'listas.apertura_id', '=', 'aperturas.id')
+            ->join('personas', 'socios.persona_id', '=', 'personas.id')
+            ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
+            ->select("socios.id", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "personas.carnet", "barrios.nombre", "aperturas.mes", "listas.estado", "aperturas.id AS apertura", "listas.id AS lista")
+            ->where('socios.id', '=', $id)
+            ->paginate(10);
 
-        // Comprobamos si es un objeto eso quiere decir si exist en la base de datos.
-        if (is_object($socio)) {
-            $data = array(
-                'code' => 200,
-                'status' => 'success',
-                'socio' => $socio
-            );
-        } else {
-            $data = array(
-                'code' => 404,
-                'status' => 'error',
-                'message' => 'El socio no existe'
-            );
-        }
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'socio' => $lista,
+        );
         return response()->json($data, $data['code']);
     }
 
@@ -258,5 +271,34 @@ class SocioController extends Controller
             );
             return response()->json($data, $data['code']);
         }
+    }
+
+    // Buscar Usuario
+    public function buscarSocios(BuscarSocioRequest $request)
+    {
+        $params = (object) $request->all(); // Devuelve un obejto
+        $texto = trim($params->textos);
+
+        $resultado = DB::table('socios')
+            ->join('personas', 'socios.persona_id', '=', 'personas.id')
+            ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
+            // ->where('email', 'LIKE', "%$texto%")
+            // ->orWhere('estado', 'LIKE', "%$texto%")
+            ->select("socios.id", "personas.carnet", "personas.expedito", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "socios.estado", "barrios.nombre")
+            ->where('personas.carnet', 'like', "%$texto%")
+            ->orWhere('personas.nombres', 'like', "%$texto%")
+            ->orWhere('personas.ap_paterno', 'like', "%$texto%")
+            ->orWhere('personas.ap_materno', 'like', "%$texto%")
+            ->orWhere('barrios.nombre', 'like', "%$texto%")
+            ->paginate(5);
+
+        $data = array(
+            'status' => 'success',
+            'code' => 200,
+            'socio' => $resultado
+        );
+
+        // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
     }
 }
