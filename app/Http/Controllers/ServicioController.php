@@ -179,6 +179,7 @@ class ServicioController extends Controller
                 try {
                     // 5.- Actualizar los datos en la base de datos.
                     Servicio::where('id', $id)->update($paramsArray);
+                    $changes = Servicio::find($id);
 
                     // var_dump($user_update);
                     // die();
@@ -188,7 +189,7 @@ class ServicioController extends Controller
                         'code' => 200,
                         'message' => 'El evento se ha modificado correctamente',
                         'servicio' => $servicio,
-                        'changes' => $paramsArray
+                        'changes' => $changes
                     );
                 } catch (Exception $e) {
                     $data = array(

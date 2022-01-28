@@ -182,7 +182,7 @@ class EventoController extends Controller
                 try {
                     // 5.- Actualizar los datos en la base de datos.
                     Evento::where('id', $id)->update($paramsArray);
-
+                    $changes = Evento::find($id);
                     // var_dump($user_update);
                     // die();
                     // 6.- Devolver el array con el resultado.
@@ -191,7 +191,7 @@ class EventoController extends Controller
                         'code' => 200,
                         'message' => 'El evento se ha modificado correctamente',
                         'evento' => $evento,
-                        'changes' => $paramsArray
+                        'changes' => $changes
                     );
                 } catch (Exception $e) {
                     $data = array(

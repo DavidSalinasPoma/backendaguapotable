@@ -7,6 +7,7 @@ use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\ListaController;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\PruebasController;
 use App\Http\Controllers\RenewController;
 use App\Http\Controllers\ServicioController;
@@ -139,6 +140,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Buscar Consumo
     Route::post('/api/desplegar/consumos', [ConsumoController::class, 'showConsumos']);
     Route::post('/api/desplegar/precios', [ConsumoController::class, 'preciosConsumos']);
+
+    /*************RUTAS PARA PRODUCTOS********/
+    // Utilizando rutas automatica productos
+    Route::resource('/api/producto', ProductosController::class);
+    Route::put('/api/delete/productos/{id}', [ProductosController::class, 'eliminarProducto']);
+
 
     // Ruta para cerrar sesion o eliminar un token
     Route::post('/api/logout', [UserController::class, 'logout']);

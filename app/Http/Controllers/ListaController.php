@@ -26,8 +26,8 @@ class ListaController extends Controller
             ->paginate(10);
 
         // Con lectura
-        $conLectura = Lista::where('listas.estado', '=', 0)->count();
-        $sinLectura = Lista::where('listas.estado', '=', 1)->count();
+        $conLectura = Lista::where('listas.estado', '=', 1)->count();
+        $sinLectura = Lista::where('listas.estado', '=', 0)->count();
 
         if ($sinLectura == 0) {
             DB::table('listas')->delete();

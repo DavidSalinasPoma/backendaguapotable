@@ -94,6 +94,10 @@ class ConsumoController extends Controller
                 // 5.- Actualizar los datos en la base de datos.
                 Lista::where('id', $params->lista_id)->update($paramsArray);
 
+
+                // crear factura
+
+
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
