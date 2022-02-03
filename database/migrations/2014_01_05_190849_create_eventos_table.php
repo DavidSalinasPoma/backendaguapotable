@@ -19,7 +19,7 @@ class CreateEventosTable extends Migration
             $table->string('evento')->unique();
             $table->string('descripcion');
             $table->double('precio');
-            $table->double('tiempo_event');
+            $table->integer('tiempo_event');
             $table->integer('estado')->default(1);
             $table->timestamps();
         });

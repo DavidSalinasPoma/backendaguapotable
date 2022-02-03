@@ -21,6 +21,7 @@ class CreateProductosTable extends Migration
             $table->integer('num_producto');
             $table->double('precio');
             $table->integer('cantidad');
+            $table->integer('estado')->default(1);
             $table->timestamps();
         });
     }

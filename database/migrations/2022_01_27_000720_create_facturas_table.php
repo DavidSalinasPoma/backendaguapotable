@@ -16,7 +16,9 @@ class CreateFacturasTable extends Migration
         Schema::create('facturas', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
-            $table->foreignId('socio_id')->constrained('socios')->onUpdate('cascade')->onDelete('restrict');
+            $table->foreignId('consumo_id')->constrained('consumos')->onUpdate('cascade')->onDelete('restrict');
+            $table->double('retraso')->default(0);
+            $table->dateTime('fecha_limite_pago');
             $table->integer('estado_pago')->default(0);
             $table->timestamps();
         });

@@ -95,25 +95,18 @@ class ProductosController extends Controller
     public function update(UpdateRequest $request, $id)
     {
         $params = (object) $request->all(); // Devuelve un obejto
-
+        $paramsArray = $request->all(); // Es un array
 
         if ($params->estado == 1) {
-            // 1.-Persona el la funcion que esta en el Modelo de soscio
+
+            $paramsArray['estado'] = 1;
 
             // Elimina Producto
             $producto = DB::table('productos')
                 ->select("*")
                 ->where("productos.nombre", "=", $params->nombre)
                 ->where("productos.num_producto", "=", $id)
-                ->delete();
-            // Crear producto
-            $producto = new Productos();
-            $producto->nombre = $params->nombre;
-            $producto->producto = $params->producto;
-            $producto->num_producto = $params->num_producto;
-            $producto->precio = $params->precio;
-            $producto->cantidad = $params->cantidad;
-            $producto->save();
+                ->update($paramsArray);
 
             $data = array(
                 'status' => 'success',
@@ -124,11 +117,12 @@ class ProductosController extends Controller
             return response()->json($data, $data['code']);
         } else {
             // Elimina Producto
+            $paramsArray['estado'] = 0;
             $producto = DB::table('productos')
                 ->select("*")
                 ->where("productos.nombre", "=", $params->nombre)
                 ->where("productos.num_producto", "=", $id)
-                ->delete();
+                ->update($paramsArray);
             $data = array(
                 'status' => 'success',
                 'code' => 200,
@@ -154,13 +148,16 @@ class ProductosController extends Controller
     {
 
         $params = (object) $request->all(); // Devuelve un obejto
+        $paramsArray = array(
+            'estado' => 0
+        );
 
         // Elimina Producto
         $producto = DB::table('productos')
             ->select("*")
             ->where("productos.nombre", "=", $params->nombre)
             ->where("productos.num_producto", "=", $id)
-            ->delete();
+            ->update($paramsArray);
 
         $data = array(
             'status' => 'success',

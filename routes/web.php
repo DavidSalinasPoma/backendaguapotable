@@ -3,8 +3,10 @@
 use App\Http\Controllers\AperturaController;
 use App\Http\Controllers\BarrioController;
 use App\Http\Controllers\ConsumoController;
+use App\Http\Controllers\DetalleController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\EventoController;
+use App\Http\Controllers\FacturaController;
 use App\Http\Controllers\ListaController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\ProductosController;
@@ -145,6 +147,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Utilizando rutas automatica productos
     Route::resource('/api/producto', ProductosController::class);
     Route::put('/api/delete/productos/{id}', [ProductosController::class, 'eliminarProducto']);
+
+    /*************RUTAS PARA FACTURAS********/
+    // Utilizando rutas automatica Factura 
+    Route::resource('/api/factura', FacturaController::class);
+    // Buscar Facturas
+    Route::post('/api/buscar/facturas', [FacturaController::class, 'buscarFacturas']);
+
+    /*************RUTAS PARA DETALLES********/
+    // Utilizando rutas automatica Detalle 
+    Route::resource('/api/detalle', DetalleController::class);
 
 
     // Ruta para cerrar sesion o eliminar un token

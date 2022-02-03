@@ -7,7 +7,9 @@ use App\Http\Requests\consumo\PrecioRequest;
 use App\Http\Requests\consumo\StoreRequest;
 use App\Http\Requests\consumo\UpdateRequest;
 use App\Models\Consumo;
+use App\Models\Evento;
 use App\Models\Lista;
+use App\Models\Productos;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -82,7 +84,7 @@ class ConsumoController extends Controller
             $consumo->apertura_id = $params->apertura_id;
 
             $paramsArray = array(
-                'estado' => 0
+                'estado' => 1
             );
 
 
@@ -93,10 +95,6 @@ class ConsumoController extends Controller
                 $consumo->save();
                 // 5.- Actualizar los datos en la base de datos.
                 Lista::where('id', $params->lista_id)->update($paramsArray);
-
-
-                // crear factura
-
 
                 $data = array(
                     'status' => 'success',
@@ -292,6 +290,9 @@ class ConsumoController extends Controller
         $params = (object) $request->all(); // Devulve un obejto
 
         switch ($params->cubos) {
+            case 0:
+                $precio = 6;
+                break;
             case 1:
                 $precio = 6;
                 break;

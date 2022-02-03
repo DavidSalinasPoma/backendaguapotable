@@ -25,4 +25,10 @@ class Consumo extends Model
     {
         return $this->belongsTo('App\Models\Socio', 'socio_id'); // Recibe a Socio
     }
+
+    // es una relacion de UNO a MUCHOS
+    public function factura()
+    {
+        return $this->hasMany('App\Models\Factura'); // se dirige hacia Factura
+    }
 }
