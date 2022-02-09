@@ -148,6 +148,7 @@ class SocioController extends Controller
             $validate = Validator::make($request->all(), [
 
                 'persona_id' => 'required',
+                'barrio_id' => 'required',
                 'estado' => 'required'
 
             ]);
@@ -169,14 +170,9 @@ class SocioController extends Controller
             } else {
 
                 // 4.- Quitar los campos que no quiero actualizar de la peticion.
-                // unset($paramsArray['id']);
-                // unset($paramsArray['password']);
-                // // unset($paramsArray['antiguo']);
+
                 unset($paramsArray['created_at']);
                 // unset($paramsArray['updated_at']);
-
-                // 3.- Cifrar la PASSWORD.
-                // $paramsArray['password'] = hash('sha256', $paramsArray['password']); // para verificar que las contraseña a consultar sean iguales.
                 try {
                     // 5.- Actualizar los datos en la base de datos.
                     Socio::where('id', $id)->update($paramsArray);
@@ -206,7 +202,7 @@ class SocioController extends Controller
             $data = array(
                 'status' => 'error',
                 'code' => 400,
-                'message' => 'Este usuario no existe.',
+                'message' => 'Este socio no existe.',
                 // 'error' => $e
             );
             return response()->json($data, $data['code']);
@@ -299,6 +295,28 @@ class SocioController extends Controller
         );
 
         // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
+    }
+
+    public function showSocios($id)
+    {
+
+        try {
+            $socio = Socio::with('persona', 'barrio')->find($id);
+            $data = array(
+                'status' => 'success',
+                'code' => 200,
+                'socio' => $socio
+            );
+        } catch (Exception $e) {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'error' => $e
+            );
+
+            // Devuelve en json con laravel
+        }
         return response()->json($data, $data['code']);
     }
 }

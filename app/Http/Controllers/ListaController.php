@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\lista\BuscarSocioRequest;
 use App\Models\Lista;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -81,15 +82,6 @@ class ListaController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -145,5 +137,27 @@ class ListaController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    // Validar eventos y servicios
+    public function validarLista()
+    {
+        $lista = Lista::all(); // Trae el usuario en formato JSON
+        try {
+            $data = array(
+                'code' => 200,
+                'status' => 'success',
+                'lista' => $lista,
+            );
+        } catch (Exception $e) {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'Sucedio un error en la consulta',
+                'error' => $e
+
+            );
+        }
+        return response()->json($data, $data['code']);
     }
 }

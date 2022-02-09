@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\apertura\StoreRequest;
 use App\Http\Requests\apertura\UpdateRequest;
 use App\Models\Apertura;
+use App\Models\Factura;
 use App\Models\Lista;
 use App\Models\Persona;
 use App\Models\Socio;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -36,63 +38,55 @@ class AperturaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(StoreRequest $request)
+    public function store($fecha)
     {
         // 1.-Recoger los usuarios por post
 
-        $params = (object) $request->all(); // Devulve un obejto
 
-        // 2.-Validar datos
-        $validate = Validator::make($request->all(), [
-            'mes' => 'required',
-        ]);
 
-        // Comprobar si los datos son validos
-        if ($validate->fails()) { // en caso si los datos fallan la validacion
-            // La validacion ha fallado
-            $data = array(
-                'status' => 'Error',
-                'code' => 400,
-                'message' => 'Los datos enviados no son correctos',
-                'empleado' => $request->all(),
-                'errors' => $validate->errors()
-            );
-        } else {
-            // Si la validacion pasa correctamente
-            // Crear el objeto usuario para guardar en la base de datos
-            $apertura = new Apertura();
-            $apertura->mes = $params->mes;
+        // Si la validacion pasa correctamente
+        // Crear el objeto usuario para guardar en la base de datos
+        $apertura = new Apertura();
+        $apertura->mes = $fecha;
 
-            try {
-                // Guardar en la base de datos
+        try {
+            // Guardar en la base de datos
 
-                // 5.-Crear el usuario
-                $apertura->save();
+            // 5.-Crear el usuario
+            $apertura->save();
 
-                // logica carga de lista
-                $socio = Socio::all()->load('persona');
+            // logica carga de lista
+            $socio = Socio::all()->load('persona');
 
-                foreach ($socio as $key => $item) {
+            foreach ($socio as $key => $item) {
+                if ($socio->estado == 1 || $socio->estado == '1') {
                     $lista = new Lista();
                     $lista->socio_id = $item->id;
                     $lista->apertura_id = $apertura->id;
                     $lista->save();
                 }
-
-                $data = array(
-                    'status' => 'success',
-                    'code' => 200,
-                    'message' => 'La apertura se ha creado correctamente',
-                    'apertura'  => $apertura
-                );
-            } catch (Exception $e) {
-                $data = array(
-                    'status' => 'Error',
-                    'code' => 404,
-                    'message' => $e
-                );
             }
+
+            $paramsArray = array(
+                'retraso' => 5
+            );
+
+            Factura::where('estado_pago', '=', 0)->update($paramsArray);
+
+            $data = array(
+                'status' => 'success',
+                'code' => 200,
+                'message' => 'La apertura se ha creado correctamente',
+                'apertura'  => $apertura
+            );
+        } catch (Exception $e) {
+            $data = array(
+                'status' => 'Error',
+                'code' => 404,
+                'message' => $e
+            );
         }
+
 
 
         // Devuelve en json con laravel

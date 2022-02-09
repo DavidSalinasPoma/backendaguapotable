@@ -18,7 +18,8 @@ class CreateFacturasTable extends Migration
             $table->bigIncrements('id');
             $table->foreignId('consumo_id')->constrained('consumos')->onUpdate('cascade')->onDelete('restrict');
             $table->double('retraso')->default(0);
-            $table->dateTime('fecha_limite_pago');
+            $table->double('total_pagado')->nullable();
+            $table->string('fecha_emision')->nullable();
             $table->integer('estado_pago')->default(0);
             $table->timestamps();
         });

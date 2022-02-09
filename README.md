@@ -55,3 +55,16 @@ Si el usuario no tiene Token no va a poder acceder.
 ## Factorys rellenar datos con Factoryes
 
 php artisan make:factory PersonaFactory
+
+## Crear tareas programadas
+
+php artisan make:command TestTask
+
+# Ver tareas programadas
+
+php artisan schedule:list
+
+# Ejecuta la tarea programada
+
+php artisan schedule:run
+php artisan schedule:work

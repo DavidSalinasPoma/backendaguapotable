@@ -103,6 +103,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/api/socio', SocioController::class);
     // Buscar Socios
     Route::post('/api/buscar/socios', [SocioController::class, 'buscarSocios']);
+    Route::get('/api/show/showsocios/{id}', [SocioController::class, 'showSocios']);
 
     /*************RUTAS PARA EMPLEADOS********/
     // Utilizando rutas automatica empleado 
@@ -135,6 +136,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/api/lista', ListaController::class);
     // Buscar listas
     Route::post('/api/buscar/listas', [ListaController::class, 'buscarSocios']);
+    Route::get('/api/buscar/validarLista', [ListaController::class, 'validarLista']);
 
     /*************RUTAS PARA CONSUMO********/
     // Utilizando rutas automatica aperturas 
@@ -153,6 +155,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/api/factura', FacturaController::class);
     // Buscar Facturas
     Route::post('/api/buscar/facturas', [FacturaController::class, 'buscarFacturas']);
+    Route::get('/api/show/retrasofactura/{id}', [FacturaController::class, 'retrasoFactura']);
 
     /*************RUTAS PARA DETALLES********/
     // Utilizando rutas automatica Detalle 

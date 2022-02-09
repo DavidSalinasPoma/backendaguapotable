@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\factura\BuscarFacturaRequest;
 use App\Http\Requests\Factura\StoreRequest;
+use App\Http\Requests\Factura\UpdateRequest;
 use App\Models\Detalle;
 use App\Models\Evento;
 use App\Models\Factura;
 use App\Models\Lista;
 use App\Models\Productos;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -89,7 +91,6 @@ class FacturaController extends Controller
             // Crear el objeto usuario para guardar en la base de datos
             $factura = new Factura();
             $factura->consumo_id = $params->consumo_id;
-            $factura->fecha_limite_pago = '2022-5-1';
 
             try {
                 // Guardar en la base de datos
@@ -218,10 +219,37 @@ class FacturaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateRequest $request, $id)
     {
-        //
+        // 2.-Recoger los usuarios por post
+        $params = (object) $request->all(); // Devuelve un obejto
+        $paramsArray = $request->all(); // Es un array
+
+        try {
+            // 5.- Actualizar los datos en la base de datos.
+            Factura::where('id', $id)->update($paramsArray);
+            $changes = Factura::find($id);
+            // var_dump($user_update);
+            // die();
+            // 6.- Devolver el array con el resultado.
+            $data = array(
+                'status' => 'Succes',
+                'code' => 200,
+                'message' => 'La factura se ha modificado correctamente',
+                'changesFactura' => $changes
+            );
+        } catch (Exception $e) {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'No se ha modificado.',
+                'error' => $e
+            );
+        }
+
+        return response()->json($data, $data['code']);
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -250,6 +278,7 @@ class FacturaController extends Controller
             ->select(
                 "facturas.id AS idFactura",
                 "facturas.estado_pago",
+                "facturas.retraso",
                 "socios.id AS idSocio",
                 "personas.nombres",
                 "personas.ap_paterno AS paterno",
@@ -276,6 +305,48 @@ class FacturaController extends Controller
         );
 
         // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
+    }
+
+    // Cuando solo exite el retraso
+    public function retrasoFactura($id)
+    {
+        // 1.-Persona el la funcion que esta en el Modelo de soscio
+        $factura = DB::table('facturas')
+            ->join('consumos', 'facturas.consumo_id', '=', 'consumos.id')
+            ->join('socios', 'consumos.socio_id', '=', 'socios.id')
+            ->join('aperturas', 'consumos.apertura_id', '=', 'aperturas.id')
+            ->join('personas', 'socios.persona_id', '=', 'personas.id')
+            ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
+            ->select(
+                // "*"
+                "facturas.id AS idFactura",
+                "facturas.retraso",
+                "facturas.total_pagado",
+                "facturas.fecha_emision",
+                "facturas.estado_pago",
+                "consumos.mes AS periodo",
+                "consumos.anio",
+                "consumos.lecturaAnterior",
+                "consumos.lecturaActual",
+                "consumos.consumo",
+                "consumos.precio AS precioConsumo",
+                "socios.id AS idSocio",
+                "personas.carnet",
+                "personas.nombres",
+                "personas.ap_paterno AS paterno",
+                "personas.ap_materno AS materno",
+                "personas.direccion",
+                "barrios.nombre AS barrio"
+            )
+            ->where("facturas.id", "=", $id)
+            ->get();
+
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'factura' => $factura,
+        );
         return response()->json($data, $data['code']);
     }
 }
