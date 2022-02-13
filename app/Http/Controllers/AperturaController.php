@@ -59,7 +59,7 @@ class AperturaController extends Controller
             $socio = Socio::all()->load('persona');
 
             foreach ($socio as $key => $item) {
-                if ($socio->estado == 1 || $socio->estado == '1') {
+                if ($item->estado == 1 || $item->estado == '1') {
                     $lista = new Lista();
                     $lista->socio_id = $item->id;
                     $lista->apertura_id = $apertura->id;

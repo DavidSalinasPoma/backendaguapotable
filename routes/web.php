@@ -154,7 +154,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Utilizando rutas automatica Factura 
     Route::resource('/api/factura', FacturaController::class);
     // Buscar Facturas
-    Route::post('/api/buscar/facturas', [FacturaController::class, 'buscarFacturas']);
+    Route::post('/api/ubicar/facturas', [FacturaController::class, 'buscarFacturas']);
+    Route::post('/api/ubicar/pruebas', [FacturaController::class, 'PruebasFacturas']);
     Route::get('/api/show/retrasofactura/{id}', [FacturaController::class, 'retrasoFactura']);
 
     /*************RUTAS PARA DETALLES********/

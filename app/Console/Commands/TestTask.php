@@ -45,7 +45,7 @@ class TestTask extends Command
         $fecha = Carbon::now();
         $fecha = $fecha->toDateString();
         $apertura = new AperturaController();
-        $apertura->store($fecha);
+        $apertura->store('2022-2-1');
         $texto =  'Esto es automatico: ' . date("Y-m-d H:i:s");
         Storage::append("lista.txt", $fecha);
     }

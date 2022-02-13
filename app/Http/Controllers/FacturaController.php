@@ -268,42 +268,48 @@ class FacturaController extends Controller
         $params = (object) $request->all(); // Devuelve un obejto
         $texto = trim($params->textos);
 
+        try {
+            $resultado = DB::table('facturas')
+                ->join('consumos', 'facturas.consumo_id', '=', 'consumos.id')
+                ->join('aperturas', 'consumos.apertura_id', '=', 'aperturas.id')
+                ->join('socios', 'consumos.socio_id', '=', 'socios.id')
+                ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
+                ->join('personas', 'socios.persona_id', '=', 'personas.id')
+                ->select(
+                    "facturas.id AS idFactura",
+                    "facturas.estado_pago",
+                    "facturas.retraso",
+                    "socios.id AS idSocio",
+                    "personas.nombres",
+                    "personas.ap_paterno AS paterno",
+                    "personas.ap_materno AS materno",
+                    "personas.carnet",
+                    "barrios.nombre AS barrio",
+                    "consumos.mes",
+                    "consumos.anio",
+                    "consumos.lecturaAnterior",
+                    "consumos.LecturaActual",
+                    "consumos.consumo",
+                    "consumos.precio AS precioConsumo",
+                    "consumos.estado"
+                )
+                ->where('personas.carnet', '=', $texto)
+                ->orWhere('socios.id', '=', $texto)
+                ->paginate(5);
 
-        $resultado = DB::table('facturas')
-            ->join('consumos', 'facturas.consumo_id', '=', 'consumos.id')
-            ->join('aperturas', 'consumos.apertura_id', '=', 'aperturas.id')
-            ->join('socios', 'consumos.socio_id', '=', 'socios.id')
-            ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
-            ->join('personas', 'socios.persona_id', '=', 'personas.id')
-            ->select(
-                "facturas.id AS idFactura",
-                "facturas.estado_pago",
-                "facturas.retraso",
-                "socios.id AS idSocio",
-                "personas.nombres",
-                "personas.ap_paterno AS paterno",
-                "personas.ap_materno AS materno",
-                "personas.carnet",
-                "barrios.nombre AS barrio",
-                "consumos.mes",
-                "consumos.anio",
-                "consumos.lecturaAnterior",
-                "consumos.LecturaActual",
-                "consumos.consumo",
-                "consumos.precio AS precioConsumo",
-                "consumos.estado"
-            )
-            ->where('personas.carnet', '=', $texto)
-            ->orWhere('socios.id', '=', $texto)
-            ->paginate(5);
-
-        $data = array(
-            'status' => 'success',
-            'code' => 200,
-            'factura' => $resultado,
-
-        );
-
+            $data = array(
+                'status' => 'success',
+                'code' => 200,
+                'factura' => $resultado,
+            );
+        } catch (Exception $e) {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'No puede buscar',
+                'error' => $e,
+            );
+        }
         // Devuelve en json con laravel
         return response()->json($data, $data['code']);
     }
@@ -346,6 +352,18 @@ class FacturaController extends Controller
             'code' => 200,
             'status' => 'success',
             'factura' => $factura,
+        );
+        return response()->json($data, $data['code']);
+    }
+
+    public function pruebasFacturas(BuscarFacturaRequest $request)
+    {
+        $params = (object) $request->all(); // Devuelve un obejto
+        $texto = trim($params->textos);
+        $data = array(
+            'status' => 'success',
+            'code' => 200,
+            'factura' => $params,
         );
         return response()->json($data, $data['code']);
     }
