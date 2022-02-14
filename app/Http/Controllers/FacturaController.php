@@ -263,10 +263,10 @@ class FacturaController extends Controller
     }
 
     // Buscar Usuario
-    public function buscarFacturas(BuscarFacturaRequest $request)
+    public function buscarFacturas(Request $request)
     {
         $params = (object) $request->all(); // Devuelve un obejto
-        $texto = trim($params->textos);
+        $texto = $params->textos;
 
         try {
             $resultado = DB::table('facturas')
@@ -356,14 +356,14 @@ class FacturaController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function pruebasFacturas(BuscarFacturaRequest $request)
+    public function pruebasFacturas(Request $request)
     {
         $params = (object) $request->all(); // Devuelve un obejto
-        $texto = trim($params->textos);
+        $texto = $params->textos;
         $data = array(
             'status' => 'success',
             'code' => 200,
-            'factura' => $params,
+            // 'factura' => $params,
         );
         return response()->json($data, $data['code']);
     }
