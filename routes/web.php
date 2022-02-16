@@ -76,13 +76,17 @@ Route::get('/persona/pruebas', [PersonaController::class, 'pruebas']);
 Route::post('/api/register', [UserController::class, 'register']);
 Route::post('/api/login', [UserController::class, 'login']);
 
+Route::group(['middleware' => ['cors']], function () {
+    //Rutas a las que se permitirá acceso
+    /*************VERIFICAR TOKEN CON EL GUARD DE ANGULAR********/
+    // Utilizando rutas automatica Barrio 
+    Route::post('/api/login/renew', [RenewController::class, 'renew']);
+});
 
 // Grupo de rutas que necesitan el token
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
-    /*************VERIFICAR TOKEN CON EL GUARD DE ANGULAR********/
-    // Utilizando rutas automatica Barrio 
-    Route::get('/api/login/renew', [RenewController::class, 'renew']);
+
 
     // /*************RUTAS PARA USUARIOS********/
     // Utilizando rutas automatica usuario 

@@ -9,8 +9,12 @@ class RenewController extends Controller
     // Metodo para controlar el token autentico
     public function renew(Request $request)
     {
+
+
+        $params = (object) $request->all(); // Devulve un obejto
+
         // $token que nos llega de la cabezera en un hedder de Angular
-        $token = $request->header('Authorization');
+        $token = $params->token;
         $separador = " ";
         $separada = explode($separador, $token);
         $token = $separada[1];
