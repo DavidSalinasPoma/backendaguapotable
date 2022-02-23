@@ -24,6 +24,7 @@ class ListaController extends Controller
             ->join('personas', 'socios.persona_id', '=', 'personas.id')
             ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
             ->select("socios.id", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "personas.carnet", "barrios.nombre", "aperturas.mes", "listas.estado")
+            ->orderBy("id")
             ->paginate(10);
 
         // Con lectura

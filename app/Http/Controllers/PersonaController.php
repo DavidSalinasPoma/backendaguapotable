@@ -101,17 +101,24 @@ class PersonaController extends Controller
 
             // $promocion->usuarios_id = $user->sub;
 
-
-            // 7.-GUARDAR EN LA BASE DE DATOS
-            $persona->save();
-            $data = array(
-                'status' => 'success',
-                'code' => 200,
-                'message' => 'Se ha registrado correctamente.',
-                'persona' => $persona
-            );
+            try {
+                // 7.-GUARDAR EN LA BASE DE DATOS
+                $persona->save();
+                $data = array(
+                    'status' => 'success',
+                    'code' => 200,
+                    'message' => 'Se ha registrado correctamente.',
+                    'persona' => $persona
+                );
+            } catch (Exception $e) {
+                $data = array(
+                    'status' => 'err',
+                    'code' => 400,
+                    'message' => 'La persona no se pudo registrar intente de nuevo.',
+                    'error' => $e
+                );
+            }
         }
-
         return response()->json($data, $data['code']);
     }
 

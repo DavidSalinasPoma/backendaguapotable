@@ -301,6 +301,7 @@ class FacturaController extends Controller
                 'status' => 'success',
                 'code' => 200,
                 'factura' => $resultado,
+                'texto' => $texto
             );
         } catch (Exception $e) {
             $data = array(

@@ -89,16 +89,13 @@ class SocioController extends Controller
                 );
             } catch (Exception $e) {
                 $data = array(
-                    'status' => 'Error',
-                    'code' => 404,
-                    'message' => $e
+                    'status' => 'err',
+                    'code' => 400,
+                    'message' => 'No se pudo guardar, intente nuevamente',
+                    'error' => $e
                 );
             }
         }
-
-
-        // Devuelve en json con laravel
-        return response()->json($data, $data['code']);
     }
 
     /**
@@ -283,6 +280,7 @@ class SocioController extends Controller
             ->select("socios.id", "personas.carnet", "personas.expedito", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "socios.estado", "barrios.nombre")
             ->where('personas.carnet', 'like', "%$texto%")
             ->orWhere('personas.nombres', 'like', "%$texto%")
+            ->orWhere('socios.id', 'like', "%$texto%")
             ->orWhere('personas.ap_paterno', 'like', "%$texto%")
             ->orWhere('personas.ap_materno', 'like', "%$texto%")
             ->orWhere('barrios.nombre', 'like', "%$texto%")
