@@ -293,7 +293,7 @@ class FacturaController extends Controller
                     "consumos.precio AS precioConsumo",
                     "consumos.estado"
                 )
-                ->where('personas.carnet', '=', $texto)
+                // ->where('personas.carnet', '=', $texto)
                 ->orWhere('socios.id', '=', $texto)
                 ->paginate(5);
 

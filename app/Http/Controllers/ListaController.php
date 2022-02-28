@@ -24,6 +24,7 @@ class ListaController extends Controller
             ->join('personas', 'socios.persona_id', '=', 'personas.id')
             ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
             ->select("socios.id", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "personas.carnet", "barrios.nombre", "aperturas.mes", "listas.estado")
+            ->where('listas.estado', "=", 0)
             ->orderBy("id")
             ->paginate(10);
 
@@ -59,9 +60,9 @@ class ListaController extends Controller
             ->join('personas', 'socios.persona_id', '=', 'personas.id')
             ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
             ->select("socios.id", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "personas.carnet", "barrios.nombre", "aperturas.mes", "listas.estado")
-            ->where('personas.carnet', 'like', "%$texto%")
+            ->where('personas.carnet', 'like', $texto)
             ->orWhere('personas.nombres', 'like', "%$texto%")
-            ->orWhere('socios.id', 'like', "%$texto%")
+            ->orWhere('socios.id', 'like', $texto)
             ->orWhere('personas.ap_paterno', 'like', "%$texto%")
             ->orWhere('personas.ap_materno', 'like', "%$texto%")
             ->orWhere('barrios.nombre', 'like', "%$texto%")

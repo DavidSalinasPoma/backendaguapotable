@@ -33,7 +33,8 @@ class PersonaController extends Controller
     public function index()
     {
 
-        $persona = Persona::orderBy('id', 'DESC')->paginate(5);
+        $persona = Persona::where('socio', '=', '0')
+            ->orderBy('id', 'DESC')->paginate(5);
 
         $data = array(
             'code' => 200,
@@ -319,6 +320,20 @@ class PersonaController extends Controller
         );
 
         // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
+    }
+
+    public function buscarPersonaUsuario()
+    {
+
+        $persona = Persona::where('estado', '=', '1')
+            ->orderBy('id', 'DESC')->paginate(5);
+
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'persona' => $persona
+        );
         return response()->json($data, $data['code']);
     }
 }

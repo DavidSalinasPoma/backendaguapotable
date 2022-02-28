@@ -36,7 +36,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 
-
 // Rutas de prueba
 Route::get('/', function () {
     return view('welcome');
@@ -101,6 +100,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::resource('/api/persona', PersonaController::class);
     // Buscar Personas
     Route::post('/api/buscar/personas', [PersonaController::class, 'buscarPersonas']);
+    // Buscar Personas Usuarios
+    Route::get('/api/buscar/personauser', [PersonaController::class, 'buscarPersonaUsuario']);
 
     /*************RUTAS PARA SOCIOS********/
     // Utilizando rutas automatica socio
