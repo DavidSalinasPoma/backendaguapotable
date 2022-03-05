@@ -82,7 +82,7 @@ class FacturaController extends Controller
             $data = array(
                 'status' => 'Error',
                 'code' => 400,
-                'message' => 'Los datos enviados no son correctos!',
+                'message' => 'Los datos enviados no son correctos En factura!',
                 'barrio' => $request->all(),
                 'errors' => $validate->errors()
             );
@@ -176,6 +176,7 @@ class FacturaController extends Controller
                 "productos.producto",
                 "productos.nombre AS categoriaProducto",
                 "facturas.retraso",
+                "facturas.fecha_emision",
                 "consumos.mes AS periodo",
                 "consumos.anio",
                 "consumos.lecturaAnterior",
@@ -279,6 +280,8 @@ class FacturaController extends Controller
                     "facturas.id AS idFactura",
                     "facturas.estado_pago",
                     "facturas.retraso",
+                    "facturas.fecha_emision",
+                    "facturas.total_pagado",
                     "socios.id AS idSocio",
                     "personas.nombres",
                     "personas.ap_paterno AS paterno",
@@ -295,6 +298,7 @@ class FacturaController extends Controller
                 )
                 // ->where('personas.carnet', '=', $texto)
                 ->orWhere('socios.id', '=', $texto)
+                ->orderBy('facturas.id', 'DESC')
                 ->paginate(5);
 
             $data = array(

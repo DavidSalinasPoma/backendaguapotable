@@ -336,4 +336,17 @@ class PersonaController extends Controller
         );
         return response()->json($data, $data['code']);
     }
+
+    public function indexPersonas()
+    {
+
+        $persona = Persona::orderBy('id', 'DESC')->paginate(5);
+
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'persona' => $persona
+        );
+        return response()->json($data, $data['code']);
+    }
 }

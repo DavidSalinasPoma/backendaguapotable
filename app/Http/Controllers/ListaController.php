@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\lista\BuscarSocioRequest;
 use App\Models\Lista;
+use App\Models\Socio;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,8 @@ class ListaController extends Controller
         $conLectura = Lista::where('listas.estado', '=', 1)->count();
         $sinLectura = Lista::where('listas.estado', '=', 0)->count();
 
+        $totalSocios = Socio::where('socios.estado', '=', 1)->count();
+
         if ($sinLectura == 0) {
             DB::table('listas')->delete();
         }
@@ -42,7 +45,8 @@ class ListaController extends Controller
             'status' => 'success',
             'socio' => $lista,
             'sLectura' => $sinLectura,
-            'cLectura' => $conLectura
+            'cLectura' => $conLectura,
+            'totalsocio' => $totalSocios,
         );
         return response()->json($data, $data['code']);
     }
@@ -68,16 +72,20 @@ class ListaController extends Controller
             ->orWhere('barrios.nombre', 'like', "%$texto%")
             ->paginate(10);
 
+
         // Con lectura
         $conLectura = Lista::where('listas.estado', '=', 1)->count();
         $sinLectura = Lista::where('listas.estado', '=', 0)->count();
+
+        $totalSocios = Socio::where('socios.estado', '=', 1)->count();
 
         $data = array(
             'status' => 'success',
             'code' => 200,
             'socio' => $resultado,
             'sLectura' => $sinLectura,
-            'cLectura' => $conLectura
+            'cLectura' => $conLectura,
+            'totalsocio' => $totalSocios,
         );
 
         // Devuelve en json con laravel

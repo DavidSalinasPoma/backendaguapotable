@@ -102,6 +102,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/api/buscar/personas', [PersonaController::class, 'buscarPersonas']);
     // Buscar Personas Usuarios
     Route::get('/api/buscar/personauser', [PersonaController::class, 'buscarPersonaUsuario']);
+    // IndexPersonas
+    Route::get('/api/buscar/indexpersonas', [PersonaController::class, 'indexPersonas']);
 
     /*************RUTAS PARA SOCIOS********/
     // Utilizando rutas automatica socio
