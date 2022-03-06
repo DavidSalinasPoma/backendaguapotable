@@ -45,12 +45,11 @@ class SocioController extends Controller
 
         $params = (object) $request->all(); // Devulve un obejto
 
-
-
         // 2.-Validar datos
         $validate = Validator::make($request->all(), [
             'persona_id' => 'required',
             'barrio_id' => 'required',
+            'directivo' => 'required',
         ]);
 
         // Comprobar si los datos son validos
@@ -69,6 +68,7 @@ class SocioController extends Controller
             $socio = new Socio();
             $socio->persona_id = $params->persona_id;
             $socio->barrio_id = $params->barrio_id;
+            $socio->directivo = $params->directivo;
 
             try {
                 // Guardar en la base de datos
@@ -112,7 +112,19 @@ class SocioController extends Controller
             ->join('aperturas', 'listas.apertura_id', '=', 'aperturas.id')
             ->join('personas', 'socios.persona_id', '=', 'personas.id')
             ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
-            ->select("socios.id", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "personas.carnet", "barrios.nombre", "aperturas.mes", "listas.estado", "aperturas.id AS apertura", "listas.id AS lista")
+            ->select(
+                "socios.id",
+                "socios.directivo",
+                "personas.nombres",
+                "personas.ap_paterno",
+                "personas.ap_materno",
+                "personas.carnet",
+                "barrios.nombre",
+                "aperturas.mes",
+                "listas.estado",
+                "aperturas.id AS apertura",
+                "listas.id AS lista"
+            )
             ->where('socios.id', '=', $id)
             ->paginate(10);
 
@@ -146,8 +158,8 @@ class SocioController extends Controller
 
                 'persona_id' => 'required',
                 'barrio_id' => 'required',
-                'estado' => 'required'
-
+                'estado' => 'required',
+                'directivo' => 'required',
             ]);
 
 
