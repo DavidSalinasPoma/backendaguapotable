@@ -38,11 +38,12 @@ class AperturaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store($fecha)
+    // public function store($fecha)  -> para el servidor
+    public function store(StoreRequest $request)
     {
-        // 1.-Recoger los usuarios por post
-
-
+        // 1.-Recoger los usuarios por post -->para potsmman
+        $params = (object) $request->all();
+        $fecha = $params->mes;
 
         // Si la validacion pasa correctamente
         // Crear el objeto usuario para guardar en la base de datos

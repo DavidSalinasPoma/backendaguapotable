@@ -201,7 +201,6 @@ class FacturaController extends Controller
         );
         return response()->json($data, $data['code']);
     }
-
     /**
      * Show the form for editing the specified resource.
      *

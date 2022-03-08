@@ -290,12 +290,12 @@ class SocioController extends Controller
             // ->where('email', 'LIKE', "%$texto%")
             // ->orWhere('estado', 'LIKE', "%$texto%")
             ->select("socios.id", "personas.carnet", "personas.expedito", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "socios.estado", "barrios.nombre")
-            ->where('personas.carnet', 'like', "%$texto%")
-            ->orWhere('personas.nombres', 'like', "%$texto%")
-            ->orWhere('socios.id', 'like', "%$texto%")
-            ->orWhere('personas.ap_paterno', 'like', "%$texto%")
-            ->orWhere('personas.ap_materno', 'like', "%$texto%")
-            ->orWhere('barrios.nombre', 'like', "%$texto%")
+            ->where("personas.carnet", "=", $texto)
+            ->orWhere("personas.nombres", "like", "%$texto%")
+            ->orWhere("socios.id", "=", $texto)
+            ->orWhere("personas.ap_paterno", "like", "%$texto%")
+            ->orWhere("personas.ap_materno", "like", "%$texto%")
+            ->orWhere("barrios.nombre", "like", "%$texto%")
             ->paginate(5);
 
         $data = array(
