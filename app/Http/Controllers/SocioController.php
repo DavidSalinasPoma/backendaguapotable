@@ -122,6 +122,7 @@ class SocioController extends Controller
                 "barrios.nombre",
                 "aperturas.mes",
                 "listas.estado",
+                "listas.directivo AS directivoLista",
                 "aperturas.id AS apertura",
                 "listas.id AS lista"
             )
@@ -289,7 +290,17 @@ class SocioController extends Controller
             ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
             // ->where('email', 'LIKE', "%$texto%")
             // ->orWhere('estado', 'LIKE', "%$texto%")
-            ->select("socios.id", "personas.carnet", "personas.expedito", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "socios.estado", "barrios.nombre")
+            ->select(
+                "socios.id",
+                "personas.carnet",
+                "personas.expedito",
+                "personas.nombres",
+                "personas.ap_paterno",
+                "personas.ap_materno",
+                "socios.estado",
+                "socios.directivo",
+                "barrios.nombre"
+            )
             ->where("personas.carnet", "=", $texto)
             ->orWhere("personas.nombres", "like", "%$texto%")
             ->orWhere("socios.id", "=", $texto)

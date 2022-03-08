@@ -58,6 +58,7 @@ class ConsumoController extends Controller
             'apertura_id' => 'required',
             'precio' => 'required',
             'consumo' => 'required',
+            'directivo' => 'required',
         ]);
 
         // Comprobar si los datos son validos
@@ -82,6 +83,7 @@ class ConsumoController extends Controller
             $consumo->anio = $params->anio;
             $consumo->socio_id = $params->socio_id;
             $consumo->apertura_id = $params->apertura_id;
+            $consumo->directivo = $params->directivo;
 
             $paramsArray = array(
                 'estado' => 1

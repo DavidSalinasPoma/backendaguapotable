@@ -12,6 +12,7 @@ use App\Models\Socio;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class AperturaController extends Controller
@@ -45,9 +46,13 @@ class AperturaController extends Controller
         $params = (object) $request->all();
         $fecha = $params->mes;
 
-        // Si la validacion pasa correctamente
+        // Eliminar datos de una tabla
+        $eliminar = DB::table('listas')->delete();
+        $eliminar = DB::statement("ALTER TABLE `listas` AUTO_INCREMENT = 1; ");
+
         // Crear el objeto usuario para guardar en la base de datos
         $apertura = new Apertura();
+        // ALTER TABLE `users` AUTO_INCREMENT = 1;
         $apertura->mes = $fecha;
 
         try {
@@ -64,6 +69,7 @@ class AperturaController extends Controller
                     $lista = new Lista();
                     $lista->socio_id = $item->id;
                     $lista->apertura_id = $apertura->id;
+                    $lista->directivo = $item->directivo;
                     $lista->save();
                 }
             }
