@@ -74,6 +74,8 @@ class FacturaController extends Controller
         // 2.-Validar datos
         $validate = Validator::make($request->all(), [
             'consumo_id' => 'required',
+            'precio' => 'required',
+            'directivo' => 'required',
         ]);
 
         // Comprobar si los datos son validos
@@ -88,67 +90,93 @@ class FacturaController extends Controller
             );
         } else {
             // Si la validacion pasa correctamente
-            // Crear el objeto usuario para guardar en la base de datos
-            $factura = new Factura();
-            $factura->consumo_id = $params->consumo_id;
 
-            try {
-                // Guardar en la base de datos
+            // Logica para directivos
+            if ($params->directivo && $params->precio <= 20) {
 
-                // 5.-Crear el usuario
-                $factura->save();
+                $factura = new Factura();
+                $factura->consumo_id = $params->consumo_id;
+                $factura->total_pagado = $params->precio;
+                $fecha = Carbon::now();
+                $fecha = $fecha->toDateString();
+                $factura->fecha_emision = $fecha;
+                $factura->estado_pago = 1;
+                try {
+                    $factura->save();
+                    $data = array(
+                        'status' => 'success',
+                        'code' => 200,
+                        'message' => 'La factura se ha creado correctamente',
+                        'factura'  => $factura
+                    );
+                } catch (Exception $e) {
+                    $data = array(
+                        'status' => 'Error',
+                        'code' => 404,
+                        'message' => $e
+                    );
+                }
+            } else {
 
-                // Aqui guardando datos de factura detalle
+                // Crear el objeto usuario para guardar en la base de datos
+                $factura = new Factura();
+                $factura->consumo_id = $params->consumo_id;
 
-                $producto = Productos::all();
+                try {
+                    // Guardar en la base de datos
 
-                foreach ($producto as $key => $item) {
-                    if ($item->estado == 1) {
-                        $detalle = new Detalle();
-                        $detalle->factura_id = $factura['id'];
-                        $detalle->producto_id = $item->id;
-                        $detalle->precio = $item->precio;
-                        $detalle->save();
+                    // 5.-Crear el usuario
+                    $factura->save();
 
-                        $sinLectura = Lista::where('listas.estado', '=', 0)->count();
-                        if ($sinLectura == 0) {
-                            $cantidad = 0;
+                    // Aqui guardando datos de factura detalle
 
-                            if ($item->nombre == 'evento' && $item->cantidad > 0) {
-                                $cantidad = $item->cantidad - 1;
-                                $paramsArray = array(
-                                    'cantidad' => $item->cantidad - 1
-                                );
-                                Productos::where('id', $item->id)->update($paramsArray);
-                            }
+                    $producto = Productos::all();
 
-                            if ($item->nombre == 'evento' && $cantidad == 0) {
-                                $arrayParams = array(
-                                    'estado' => 0
-                                );
-                                Productos::where('id', $item->id)->update($arrayParams);
-                                Evento::where('id', $item->num_producto)->update($arrayParams);
+                    foreach ($producto as $key => $item) {
+                        if ($item->estado == 1) {
+                            $detalle = new Detalle();
+                            $detalle->factura_id = $factura['id'];
+                            $detalle->producto_id = $item->id;
+                            $detalle->precio = $item->precio;
+                            $detalle->save();
+
+                            $sinLectura = Lista::where('listas.estado', '=', 0)->count();
+                            if ($sinLectura == 0) {
+                                $cantidad = 0;
+
+                                if ($item->nombre == 'evento' && $item->cantidad > 0) {
+                                    $cantidad = $item->cantidad - 1;
+                                    $paramsArray = array(
+                                        'cantidad' => $item->cantidad - 1
+                                    );
+                                    Productos::where('id', $item->id)->update($paramsArray);
+                                }
+
+                                if ($item->nombre == 'evento' && $cantidad == 0) {
+                                    $arrayParams = array(
+                                        'estado' => 0
+                                    );
+                                    Productos::where('id', $item->id)->update($arrayParams);
+                                    Evento::where('id', $item->num_producto)->update($arrayParams);
+                                }
                             }
                         }
                     }
+                    $data = array(
+                        'status' => 'success',
+                        'code' => 200,
+                        'message' => 'La factura se ha creado correctamente',
+                        'factura'  => $factura
+                    );
+                } catch (Exception $e) {
+                    $data = array(
+                        'status' => 'Error',
+                        'code' => 404,
+                        'message' => $e
+                    );
                 }
-
-
-                $data = array(
-                    'status' => 'success',
-                    'code' => 200,
-                    'message' => 'La factura se ha creado correctamente',
-                    'factura'  => $factura
-                );
-            } catch (Exception $e) {
-                $data = array(
-                    'status' => 'Error',
-                    'code' => 404,
-                    'message' => $e
-                );
             }
         }
-
         // Devuelve en json con laravel
         return response()->json($data, $data['code']);
     }
@@ -183,6 +211,7 @@ class FacturaController extends Controller
                 "consumos.lecturaActual",
                 "consumos.consumo",
                 "consumos.precio AS precioConsumo",
+                "consumos.directivo",
                 "socios.id AS idSocio",
                 "personas.carnet",
                 "personas.nombres",
@@ -201,15 +230,42 @@ class FacturaController extends Controller
         );
         return response()->json($data, $data['code']);
     }
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+
+    public function showFactura($id)
     {
-        //
+        // 1.-Persona el la funcion que esta en el Modelo de soscio
+        $factura = DB::table('facturas')
+            ->join('consumos', 'facturas.consumo_id', '=', 'consumos.id')
+            ->join('socios', 'consumos.socio_id', '=', 'socios.id')
+            ->join('personas', 'socios.persona_id', '=', 'personas.id')
+            ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
+            ->select(
+                "facturas.fecha_emision",
+                "facturas.total_pagado",
+                "consumos.mes AS periodo",
+                "consumos.anio",
+                "consumos.lecturaAnterior",
+                "consumos.lecturaActual",
+                "consumos.consumo",
+                "consumos.precio AS precioConsumo",
+                "consumos.directivo",
+                "socios.id AS idSocio",
+                "personas.carnet",
+                "personas.nombres",
+                "personas.ap_paterno AS paterno",
+                "personas.ap_materno AS materno",
+                "personas.direccion",
+                "barrios.nombre AS barrio"
+            )
+            ->where("facturas.id", "=", $id)
+            ->get();
+
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'factura' => $factura,
+        );
+        return response()->json($data, $data['code']);
     }
 
     /**
@@ -293,7 +349,8 @@ class FacturaController extends Controller
                     "consumos.LecturaActual",
                     "consumos.consumo",
                     "consumos.precio AS precioConsumo",
-                    "consumos.estado"
+                    "consumos.estado",
+                    "consumos.directivo"
                 )
                 // ->where('personas.carnet', '=', $texto)
                 ->orWhere('socios.id', '=', $texto)
@@ -341,6 +398,7 @@ class FacturaController extends Controller
                 "consumos.lecturaActual",
                 "consumos.consumo",
                 "consumos.precio AS precioConsumo",
+                "consumos.directivo",
                 "socios.id AS idSocio",
                 "personas.carnet",
                 "personas.nombres",

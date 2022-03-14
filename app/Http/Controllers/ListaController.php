@@ -73,7 +73,17 @@ class ListaController extends Controller
             ->join('aperturas', 'listas.apertura_id', '=', 'aperturas.id')
             ->join('personas', 'socios.persona_id', '=', 'personas.id')
             ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
-            ->select("socios.id", "personas.nombres", "personas.ap_paterno", "personas.ap_materno", "personas.carnet", "barrios.nombre", "aperturas.mes", "listas.estado")
+            ->select(
+                "socios.id",
+                "personas.nombres",
+                "personas.ap_paterno",
+                "personas.ap_materno",
+                "personas.carnet",
+                "barrios.nombre",
+                "aperturas.mes",
+                "listas.estado",
+                "listas.directivo"
+            )
             ->where('personas.carnet', 'like', $texto)
             ->orWhere('personas.nombres', 'like', "%$texto%")
             ->orWhere('socios.id', 'like', $texto)
