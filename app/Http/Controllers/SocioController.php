@@ -219,6 +219,31 @@ class SocioController extends Controller
         }
     }
 
+    public function deleteSocioDirectorio($id)
+    {
+        $paramsArray = array(
+            'directivo' => 0
+        );
+
+        try {
+            // Actualizar los datos en la base de datos.
+            Socio::where('id', $id)->update($paramsArray);
+            $data = array(
+                'status' => 'Succes',
+                'code' => 200,
+                'message' => 'El Socio se ha modificado correctamente'
+            );
+        } catch (Exception $e) {
+            $data = array(
+                'status' => 'error',
+                'code' => 400,
+                'message' => 'No se ha modificado.',
+                'error' => $e
+            );
+        }
+        return response()->json($data, $data['code']);
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -338,6 +363,37 @@ class SocioController extends Controller
 
             // Devuelve en json con laravel
         }
+        return response()->json($data, $data['code']);
+    }
+
+    public function reporteDirectorio()
+    {
+        // 1.-Persona el la funcion que esta en el Modelo de soscio
+        $directivos = DB::table('socios')
+            ->join('personas', 'socios.persona_id', '=', 'personas.id')
+            ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
+            // ->where('email', 'LIKE', "%$texto%")
+            // ->orWhere('estado', 'LIKE', "%$texto%")
+            ->select(
+                "socios.id",
+                "personas.carnet",
+                "personas.expedito",
+                "personas.nombres",
+                "personas.ap_paterno AS paterno",
+                "personas.ap_materno AS materno",
+                "socios.estado",
+                "socios.directivo",
+                "barrios.nombre AS barrio"
+            )
+            ->where("socios.directivo", "=", 1)
+            ->where("socios.estado", "=", 1)
+            ->get();
+
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'directivos' => $directivos
+        );
         return response()->json($data, $data['code']);
     }
 }
