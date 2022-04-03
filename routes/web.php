@@ -12,6 +12,7 @@ use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\PruebasController;
 use App\Http\Controllers\RenewController;
+use App\Http\Controllers\ReunionesController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SocioController;
 use App\Http\Controllers\UserController;
@@ -108,6 +109,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /*************RUTAS PARA SOCIOS********/
     // Utilizando rutas automatica socio
     Route::resource('/api/socio', SocioController::class);
+    Route::get('/api/show/socioporbarrio/{id}', [SocioController::class, 'socioporBarrio']);
     // Buscar Socios
     Route::post('/api/buscar/socios', [SocioController::class, 'buscarSocios']);
     Route::get('/api/show/showsocios/{id}', [SocioController::class, 'showSocios']);
@@ -171,6 +173,14 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     /*************RUTAS PARA DETALLES********/
     // Utilizando rutas automatica Detalle 
     Route::resource('/api/detalle', DetalleController::class);
+
+
+    /*************RUTAS PARA REUNIONES********/
+    // Utilizando rutas automatica Barrio 
+    Route::resource('/api/reunion', ReunionesController::class);
+
+    // Buscar reuniones
+    Route::post('/api/buscar/reuniones', [ReunionesController::class, 'buscarReuniones']);
 
 
     // Ruta para cerrar sesion o eliminar un token

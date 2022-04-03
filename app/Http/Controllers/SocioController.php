@@ -396,4 +396,38 @@ class SocioController extends Controller
         );
         return response()->json($data, $data['code']);
     }
+
+    // Reportes 
+
+    // Reportes socios por barrios
+    public function socioporBarrio($id)
+    {
+        // 1.-Persona el la funcion que esta en el Modelo de soscio
+        $socio = DB::table('socios')
+            ->join('personas', 'socios.persona_id', '=', 'personas.id')
+            ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
+            // ->where('email', 'LIKE', "%$texto%")
+            // ->orWhere('estado', 'LIKE', "%$texto%")
+            ->select(
+                "socios.id",
+                "personas.carnet",
+                "personas.expedito",
+                "personas.nombres",
+                "personas.ap_paterno AS paterno",
+                "personas.ap_materno AS materno",
+                "socios.estado",
+                "socios.directivo",
+                "barrios.nombre AS barrio"
+            )
+            ->where("barrios.id", "=", $id)
+            ->orderBy('id', 'ASC')
+            ->get();
+
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'socio' => $socio
+        );
+        return response()->json($data, $data['code']);
+    }
 }
