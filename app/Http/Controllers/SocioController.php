@@ -430,4 +430,16 @@ class SocioController extends Controller
         );
         return response()->json($data, $data['code']);
     }
+    public function reporteGerenalSocios()
+    {
+        // 1.-Persona el la funcion que esta en el Modelo de soscio
+        $socio = Socio::with('persona', 'barrio')->orderBy('id', 'ASC')->get();
+
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'socio' => $socio
+        );
+        return response()->json($data, $data['code']);
+    }
 }

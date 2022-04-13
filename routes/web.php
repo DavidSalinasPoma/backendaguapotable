@@ -114,6 +114,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::post('/api/buscar/socios', [SocioController::class, 'buscarSocios']);
     Route::get('/api/show/showsocios/{id}', [SocioController::class, 'showSocios']);
     Route::get('/api/index/reportedirectorio', [SocioController::class, 'reporteDirectorio']);
+    Route::get('/api/index/reportesocios', [SocioController::class, 'reporteGerenalSocios']);
     Route::get('/api/delete/deletesociodirectorio/{id}', [SocioController::class, 'deleteSocioDirectorio']);
 
     /*************RUTAS PARA EMPLEADOS********/
