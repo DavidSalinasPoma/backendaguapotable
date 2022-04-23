@@ -38,4 +38,10 @@ class Socio extends Model
     {
         return $this->hasMany('App\Models\Lista'); // se dirige hacia Lista
     }
+
+    // Se dirige hacia detalle reunion
+    public function detallereunion()
+    {
+        return $this->hasMany('App\Models\DetalleReunion'); // se dirige hacia detalle reunion
+    }
 }

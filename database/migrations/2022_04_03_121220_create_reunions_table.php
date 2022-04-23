@@ -13,7 +13,7 @@ class CreateReunionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('reunions', function (Blueprint $table) {
+        Schema::create('reuniones', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->bigIncrements('id');
             $table->string('reunion')->unique();

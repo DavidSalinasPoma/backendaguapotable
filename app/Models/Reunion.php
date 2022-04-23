@@ -13,4 +13,10 @@ class Reunion extends Model
 
     // 1.- indicamos la tabla que va a utilizar de la base de datos
     protected $table = 'reuniones';
+
+    // Se dirige hacia detalle reunion
+    public function detallereunion()
+    {
+        return $this->hasMany('App\Models\DetalleReunion'); // se dirige hacia reunnion detalle
+    }
 }

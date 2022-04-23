@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\reunion\BuscarReunionRequest;
 use App\Http\Requests\reunion\StoreRequest;
+use App\Models\DetalleReunion;
 use App\Models\Reunion;
+use App\Models\Socio;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -72,10 +74,27 @@ class ReunionesController extends Controller
                 // Guardar en la base de datos
                 // 5.-Crear el usuario
                 $reunion->save();
+
+                $data = Reunion::latest('id')->first();
+
+                // echo $data->id;
+                // die();
+
+                // logica carga de lista
+                $socio = Socio::all()->load('persona');
+
+                foreach ($socio as $key => $item) {
+                    if ($item->estado == 1 || $item->estado == '1') {
+                        $lista = new DetalleReunion();
+                        $lista->socio_id = $item->id;
+                        $lista->reunion_id = $data->id;
+                        $lista->save();
+                    }
+                }
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
-                    'message' => 'La reunión se correctamente',
+                    'message' => 'La reunión se creo correctamente',
                     'reunion'  => $reunion
                 );
             } catch (Exception $e) {
@@ -86,8 +105,6 @@ class ReunionesController extends Controller
                 );
             }
         }
-
-
         // Devuelve en json con laravel
         return response()->json($data, $data['code']);
     }

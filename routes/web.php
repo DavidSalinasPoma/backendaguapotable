@@ -4,6 +4,7 @@ use App\Http\Controllers\AperturaController;
 use App\Http\Controllers\BarrioController;
 use App\Http\Controllers\ConsumoController;
 use App\Http\Controllers\DetalleController;
+use App\Http\Controllers\DetallereunionController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\FacturaController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\ProductosController;
 use App\Http\Controllers\PruebasController;
 use App\Http\Controllers\RenewController;
+use App\Http\Controllers\ReportesController;
 use App\Http\Controllers\ReunionesController;
 use App\Http\Controllers\ServicioController;
 use App\Http\Controllers\SocioController;
@@ -183,6 +185,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Buscar reuniones
     Route::post('/api/buscar/reuniones', [ReunionesController::class, 'buscarReuniones']);
 
+
+    /*************RUTAS PARA REPORTES********/
+    // Utilizando rutas automatica Barrio 
+    Route::resource('/api/reportes', ReportesController::class);
+
+    Route::post('/api/indexreportes/cobroxmes', [ReportesController::class, 'cobroxMes']);
+
+    /*************RUTAS PARA DETALLE REUNIONES********/
+    // Utilizando rutas automatica Barrio 
+    Route::resource('/api/detalleReunion', DetallereunionController::class);
+
+    Route::get('/api/indexlista/detalle/{id}', [DetallereunionController::class, 'indexDetalle']);
+
+    Route::get('/api/indexlista/detalleReunion/{id}', [DetallereunionController::class, 'indexListaDetalle']);
+
+    Route::put('/api/lista/detalleReunion/{id}', [DetallereunionController::class, 'updateListaDetalle']);
 
     // Ruta para cerrar sesion o eliminar un token
     Route::post('/api/logout', [UserController::class, 'logout']);

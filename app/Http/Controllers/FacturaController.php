@@ -99,6 +99,11 @@ class FacturaController extends Controller
                 $factura->total_pagado = $params->precio;
                 $fecha = Carbon::now();
                 $fecha = $fecha->toDateString();
+                // $date = Carbon::parse($fecha);
+                // $mes = $date->diffForHumans();
+                // $anio = $date->year;
+                // $factura->mes_pago = $mes;
+                // $factura->anio_pago = $anio;
                 $factura->fecha_emision = $fecha;
                 $factura->estado_pago = 1;
                 try {
