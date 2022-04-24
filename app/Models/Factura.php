@@ -17,4 +17,10 @@ class Factura extends Model
     {
         return $this->belongsTo('App\Models\Consumo', 'consumo_id'); // Recibe a Consumo
     }
+
+    // Se dirige hacia factura reunion
+    public function facturareunion()
+    {
+        return $this->hasMany('App\Models\FacturaReunion'); // se dirige hacia Factura reunion
+    }
 }

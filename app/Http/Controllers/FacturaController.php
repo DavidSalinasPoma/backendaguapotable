@@ -6,10 +6,13 @@ use App\Http\Requests\factura\BuscarFacturaRequest;
 use App\Http\Requests\Factura\StoreRequest;
 use App\Http\Requests\Factura\UpdateRequest;
 use App\Models\Detalle;
+use App\Models\DetalleReunion;
 use App\Models\Evento;
 use App\Models\Factura;
+use App\Models\FacturaReunion;
 use App\Models\Lista;
 use App\Models\Productos;
+use App\Models\Reunion;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -76,6 +79,7 @@ class FacturaController extends Controller
             'consumo_id' => 'required',
             'precio' => 'required',
             'directivo' => 'required',
+            'socio_id' => 'required',
         ]);
 
         // Comprobar si los datos son validos
@@ -90,10 +94,11 @@ class FacturaController extends Controller
             );
         } else {
             // Si la validacion pasa correctamente
-
             // Logica para directivos
             if ($params->directivo && $params->precio <= 20) {
 
+
+                // Guarda directo en factura y no en detalle
                 $factura = new Factura();
                 $factura->consumo_id = $params->consumo_id;
                 $factura->total_pagado = $params->precio;
@@ -107,12 +112,67 @@ class FacturaController extends Controller
                 $factura->fecha_emision = $fecha;
                 $factura->estado_pago = 1;
                 try {
+
                     $factura->save();
+
+
+                    // Logica para guardar facturaDetalle
+                    $listaReunion = Reunion::all();
+                    foreach ($listaReunion as $key => $item) {
+                        if ($item->estado == 1 && $item->estado_consumo == 0) {
+                            $socioMulta = DetalleReunion::with('reunion')
+                                ->where("socio_id", "=", $params->socio_id)
+                                ->where("reunion_id", "=", $item->id)
+                                ->first();
+
+                            switch ($socioMulta->opcion) {
+                                case 'si':
+                                    // Guardar en factura reunion
+                                    $facturaReunion = new FacturaReunion();
+                                    $facturaReunion->factura_id = $factura['id'];
+                                    $facturaReunion->reunion_id = $socioMulta->reunion_id;
+                                    $facturaReunion->opcion = $socioMulta->opcion;
+                                    $facturaReunion->precio = 0;
+                                    $facturaReunion->reunion = $socioMulta->reunion->reunion;
+                                    $facturaReunion->fecha_reunion = $socioMulta->reunion->fecha;
+                                    $facturaReunion->save();
+                                    break;
+                                case 'no':
+                                    // Guardar en factura reunion
+                                    $facturaReunion = new FacturaReunion();
+                                    $facturaReunion->factura_id = $factura['id'];
+                                    $facturaReunion->reunion_id = $socioMulta->reunion_id;
+                                    $facturaReunion->opcion = $socioMulta->opcion;
+                                    $facturaReunion->precio = $socioMulta->reunion->multa;
+                                    $facturaReunion->reunion = $socioMulta->reunion->reunion;
+                                    $facturaReunion->fecha_reunion = $socioMulta->reunion->fecha;
+                                    $facturaReunion->save();
+                                    break;
+                                case 'retraso':
+                                    // Guardar en factura reunion
+                                    $facturaReunion = new FacturaReunion();
+                                    $facturaReunion->factura_id = $factura['id'];
+                                    $facturaReunion->reunion_id = $socioMulta->reunion_id;
+                                    $facturaReunion->opcion = $socioMulta->opcion;
+                                    $facturaReunion->precio = 5;
+                                    $facturaReunion->reunion = $socioMulta->reunion->reunion;
+                                    $facturaReunion->fecha_reunion = $socioMulta->reunion->fecha;
+                                    $facturaReunion->save();
+                                    break;
+                            }
+                        }
+                    }
+                    // Fin Logica para guardar facturaDetalle
+
+
+
                     $data = array(
                         'status' => 'success',
                         'code' => 200,
                         'message' => 'La factura se ha creado correctamente',
-                        'factura'  => $factura
+                        'factura'  => $factura,
+                        'socioMulta' => $socioMulta,
+                        // 'opcion' => $socioMulta->opcion,
                     );
                 } catch (Exception $e) {
                     $data = array(
@@ -130,11 +190,61 @@ class FacturaController extends Controller
                 try {
                     // Guardar en la base de datos
 
-                    // 5.-Crear el usuario
+                    // Guarda en factura y en detalle los directivos mayores a 20
                     $factura->save();
 
-                    // Aqui guardando datos de factura detalle
 
+                    // Logica para guardar facturaDetalle
+                    $listaReunion = Reunion::all();
+                    foreach ($listaReunion as $key => $item) {
+                        if ($item->estado == 1 && $item->estado_consumo == 0) {
+                            $socioMulta = DetalleReunion::with('reunion')
+                                ->where("socio_id", "=", $params->socio_id)
+                                ->where("reunion_id", "=", $item->id)
+                                ->first();
+
+                            switch ($socioMulta->opcion) {
+                                case 'si':
+                                    // Guardar en factura reunion
+                                    $facturaReunion = new FacturaReunion();
+                                    $facturaReunion->factura_id = $factura['id'];
+                                    $facturaReunion->reunion_id = $socioMulta->reunion_id;
+                                    $facturaReunion->opcion = $socioMulta->opcion;
+                                    $facturaReunion->precio = 0;
+                                    $facturaReunion->reunion = $socioMulta->reunion->reunion;
+                                    $facturaReunion->fecha_reunion = $socioMulta->reunion->fecha;
+                                    $facturaReunion->save();
+                                    break;
+                                case 'no':
+                                    // Guardar en factura reunion
+                                    $facturaReunion = new FacturaReunion();
+                                    $facturaReunion->factura_id = $factura['id'];
+                                    $facturaReunion->reunion_id = $socioMulta->reunion_id;
+                                    $facturaReunion->opcion = $socioMulta->opcion;
+                                    $facturaReunion->precio = $socioMulta->reunion->multa;
+                                    $facturaReunion->reunion = $socioMulta->reunion->reunion;
+                                    $facturaReunion->fecha_reunion = $socioMulta->reunion->fecha;
+                                    $facturaReunion->save();
+                                    break;
+                                case 'retraso':
+                                    // Guardar en factura reunion
+                                    $facturaReunion = new FacturaReunion();
+                                    $facturaReunion->factura_id = $factura['id'];
+                                    $facturaReunion->reunion_id = $socioMulta->reunion_id;
+                                    $facturaReunion->opcion = $socioMulta->opcion;
+                                    $facturaReunion->precio = 5;
+                                    $facturaReunion->reunion = $socioMulta->reunion->reunion;
+                                    $facturaReunion->fecha_reunion = $socioMulta->reunion->fecha;
+                                    $facturaReunion->save();
+                                    break;
+                            }
+                        }
+                    }
+                    // Fin Logica para guardar facturaDetalle
+
+
+
+                    // Aqui guardando datos de factura detalle
                     $producto = Productos::all();
 
                     foreach ($producto as $key => $item) {
@@ -171,7 +281,9 @@ class FacturaController extends Controller
                         'status' => 'success',
                         'code' => 200,
                         'message' => 'La factura se ha creado correctamente',
-                        'factura'  => $factura
+                        'factura'  => $factura,
+                        'socioMulta' => $socioMulta,
+                        // 'opcion' => $socioMulta->opcion,
                     );
                 } catch (Exception $e) {
                     $data = array(
@@ -431,6 +543,29 @@ class FacturaController extends Controller
             'status' => 'success',
             'code' => 200,
             // 'factura' => $params,
+        );
+        return response()->json($data, $data['code']);
+    }
+
+    // para sacar el reporte de facturasReuniones
+    public function showFacturaReunion($id)
+    {
+        // 1.-Persona el la funcion que esta en el Modelo de soscio
+        $facturaReunion = DB::table('factura_reunion')
+            ->join('facturas', 'factura_reunion.factura_id', '=', 'facturas.id')
+            ->join('reuniones', 'factura_reunion.reunion_id', '=', 'reuniones.id')
+            ->select(
+                "factura_reunion.precio",
+                "factura_reunion.reunion",
+                "factura_reunion.fecha_reunion"
+            )
+            ->where("factura_reunion.factura_id", "=", $id)
+            ->get();
+
+        $data = array(
+            'code' => 200,
+            'status' => 'success',
+            'facturaReunion' => $facturaReunion,
         );
         return response()->json($data, $data['code']);
     }

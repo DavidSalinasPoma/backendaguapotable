@@ -19,4 +19,10 @@ class Reunion extends Model
     {
         return $this->hasMany('App\Models\DetalleReunion'); // se dirige hacia reunnion detalle
     }
+
+    // Se dirige hacia factura reunion
+    public function facturareunion()
+    {
+        return $this->hasMany('App\Models\FacturaReunion'); // se dirige hacia Factura reunion
+    }
 }

@@ -172,6 +172,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/api/ubicar/pruebas', [FacturaController::class, 'pruebasFacturas']);
     Route::get('/api/show/retrasofactura/{id}', [FacturaController::class, 'retrasoFactura']);
     Route::get('/api/show/factura/{id}', [FacturaController::class, 'showFactura']);
+    Route::get('/api/show/facturareunion/{id}', [FacturaController::class, 'showFacturaReunion']);
 
     /*************RUTAS PARA DETALLES********/
     // Utilizando rutas automatica Detalle 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\lista\BuscarSocioRequest;
 use App\Models\Lista;
+use App\Models\Reunion;
 use App\Models\Socio;
 use Exception;
 use Illuminate\Http\Request;
@@ -172,7 +173,7 @@ class ListaController extends Controller
     // Validar eventos y servicios
     public function validarLista()
     {
-        $lista = Lista::all(); // Trae el usuario en formato JSON
+        $lista = Lista::where("estado", "=", 10)->get(); // Trae el usuario en formato JSON
         try {
             $data = array(
                 'code' => 200,

@@ -10,6 +10,7 @@ use App\Models\Consumo;
 use App\Models\Evento;
 use App\Models\Lista;
 use App\Models\Productos;
+use App\Models\Reunion;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
@@ -84,7 +85,6 @@ class ConsumoController extends Controller
             $consumo->socio_id = $params->socio_id;
             $consumo->apertura_id = $params->apertura_id;
             $consumo->directivo = $params->directivo;
-
             $paramsArray = array(
                 'estado' => 1
             );
@@ -92,11 +92,20 @@ class ConsumoController extends Controller
 
             try {
                 // Guardar en la base de datos
-
                 // 5.-Crear el usuario
                 $consumo->save();
                 // 5.- Actualizar los datos en la base de datos.
                 Lista::where('id', $params->lista_id)->update($paramsArray);
+
+                // Logica para modificar el estado_consumo de reunion
+                $lista = Lista::where("estado", "=", 0)->get(); // Trae el usuario en formato JSON
+                if (count($lista) == 0) {
+                    $paramsArrayLista = array(
+                        'estado_consumo' => 1
+                    );
+                    Reunion::where('estado', '=', 1)->update($paramsArrayLista);
+                }
+                // Fin Logica para modificar el estado de reunion Consumo
 
                 $data = array(
                     'status' => 'success',
