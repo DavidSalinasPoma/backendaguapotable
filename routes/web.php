@@ -193,6 +193,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post('/api/indexreportes/cobroxmes', [ReportesController::class, 'cobroxMes']);
 
+
     /*************RUTAS PARA DETALLE REUNIONES********/
     // Utilizando rutas automatica Barrio 
     Route::resource('/api/detalleReunion', DetallereunionController::class);

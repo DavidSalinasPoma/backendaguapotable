@@ -95,7 +95,10 @@ class ConsumoController extends Controller
                 // 5.-Crear el usuario
                 $consumo->save();
                 // 5.- Actualizar los datos en la base de datos.
-                Lista::where('id', $params->lista_id)->update($paramsArray);
+                // Lista::where('id', $params->lista_id)->update($paramsArray);
+                DB::table('listas')
+                    ->where('id', $params->lista_id)
+                    ->update($paramsArray);
 
                 // Logica para modificar el estado_consumo de reunion
                 $lista = Lista::where("estado", "=", 0)->get(); // Trae el usuario en formato JSON
@@ -103,7 +106,10 @@ class ConsumoController extends Controller
                     $paramsArrayLista = array(
                         'estado_consumo' => 1
                     );
-                    Reunion::where('estado', '=', 1)->update($paramsArrayLista);
+                    // Reunion::where('estado', '=', 1)->update($paramsArrayLista);
+                    DB::table('reuniones')
+                        ->where('estado', '=', 1)
+                        ->update($paramsArrayLista);
                 }
                 // Fin Logica para modificar el estado de reunion Consumo
 

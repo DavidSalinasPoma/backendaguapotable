@@ -83,6 +83,8 @@ class DetallereunionController extends Controller
      */
     public function update(UpdateRequest $request, $id)
     {
+
+
         // 1.- Validar datos recogidos por POST. pasando al getIdentity true
         $validate = Validator::make($request->all(), [
 
@@ -107,12 +109,14 @@ class DetallereunionController extends Controller
         } else {
 
             // 4.- Quitar los campos que no quiero actualizar de la peticion.
-            unset($paramsArray['created_at']);
+            // unset($paramsArray['created_at']);
             // unset($paramsArray['updated_at']);
 
             try {
                 // 5.- Actualizar los datos en la base de datos.
-                Detallereunion::where('id', $id)->update($paramsArray);
+                DB::table('reunion_detalles')
+                    ->where('id', $id)
+                    ->update($paramsArray);
 
                 // var_dump($user_update);
                 // die();

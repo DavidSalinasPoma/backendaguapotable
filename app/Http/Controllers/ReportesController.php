@@ -73,6 +73,26 @@ class ReportesController extends Controller
         // 1.-Recoger los usuarios por post
         $params = (object) $request->all(); // Devulve un obejto
 
+
+        // Consulta nro:1 solo consumo de todos en general
+        $consumoTotal = DB::table('facturas')
+            ->join(
+                'consumos',
+                'facturas.consumo_id',
+                '=',
+                'consumos.id'
+            )
+            ->select(
+                "facturas.mes_pago",
+                DB::raw('SUM(consumos.precio) as consumoTotal'),
+            )
+            ->where('facturas.mes_pago', '=', $params->mes)
+            ->where('facturas.anio_pago', '=', $params->anio)
+            ->where('facturas.estado_pago', '=', 1)
+            ->groupBy('facturas.mes_pago')
+            ->get();
+
+
         // Agrupacion  de productos por mes de cobro
         $details = DB::table('detalles')
             ->join('facturas', 'detalles.factura_id', '=', 'facturas.id')
@@ -95,6 +115,26 @@ class ReportesController extends Controller
 
         // Agrupacion del cobro total de la factura por mes
         $facturas = DB::table('facturas')
+            ->join('consumos', 'facturas.consumo_id', '=', 'consumos.id')
+            ->select(
+                "facturas.mes_pago",
+                DB::raw('SUM(consumos.precio) as sumaFacturas_total'),
+            )
+            ->where('facturas.mes_pago', '=', $params->mes)
+            ->where('facturas.anio_pago', '=', $params->anio)
+            ->where('facturas.estado_pago', '=', 1)
+            ->groupBy('facturas.mes_pago')
+            ->get();
+
+
+        // Agrupacion del cobro total de la factura por mes
+        $facturaTotal = DB::table('facturas')
+            ->join(
+                'consumos',
+                'facturas.consumo_id',
+                '=',
+                'consumos.id'
+            )
             ->select(
                 "facturas.mes_pago",
                 DB::raw('SUM(facturas.total_pagado) as sumaFacturas_total'),
@@ -131,6 +171,20 @@ class ReportesController extends Controller
             ->where('facturas.anio_pago', '=', $params->anio)
             ->where('facturas.estado_pago', '=', 1)
             ->where('facturas.retraso', '=', 5)
+            ->groupBy('facturas.mes_pago')
+            ->get();
+
+
+        // Reporte de socios que tienen multa de reuniones
+        $multaReunion = DB::table('factura_reunion')
+            ->join('facturas', 'factura_reunion.factura_id', '=', 'facturas.id')
+            ->select(
+                "facturas.mes_pago",
+                DB::raw('SUM(factura_reunion.precio) as sumaReunion'),
+            )
+            ->where('facturas.mes_pago', '=', $params->mes)
+            ->where('facturas.anio_pago', '=', $params->anio)
+            ->where('facturas.estado_pago', '=', 1)
             ->groupBy('facturas.mes_pago')
             ->get();
 
@@ -173,11 +227,14 @@ class ReportesController extends Controller
         $data = array(
             'status' => 'success',
             'code' => 200,
-            'sumaSoloConsumoTotal' => $sumaFinal,
+            'consumoTotal' => $consumoTotal,
             'facturaTotalMes' => $facturas,
             'facturaTotalDirectivos' => $directivos,
             'facturaTotalRetrasos' => $multasRetrasos,
             'agrupados' => $details,
+            'multaReunion' => $multaReunion,
+            'consumoPrecioTotal' => $consumoTotal,
+            'facturaTotal' => $facturaTotal
         );
 
         // Devuelve en json con laravel
