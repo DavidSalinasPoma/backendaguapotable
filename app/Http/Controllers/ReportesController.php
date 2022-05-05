@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\reportes\CobroxMesRequest;
+use App\Http\Requests\reportes\CobroxMesSociosRequest;
 use App\Models\Detalle;
 use App\Models\Productos;
 use Carbon\Carbon;
@@ -69,13 +70,11 @@ class ReportesController extends Controller
     // Reportes del total de ganancias
     public function cobroxMes(CobroxMesRequest $request)
     {
-
         // 1.-Recoger los usuarios por post
         $params = (object) $request->all(); // Devulve un obejto
 
-
-        // Consulta nro:1 solo consumo de todos en general
-        $consumoTotal = DB::table('facturas')
+        // Consulta NRO:1 solo consumo de todos en general
+        $consumoDirectivoVeinte = DB::table('facturas')
             ->join(
                 'consumos',
                 'facturas.consumo_id',
@@ -84,7 +83,27 @@ class ReportesController extends Controller
             )
             ->select(
                 "facturas.mes_pago",
-                DB::raw('SUM(consumos.precio) as consumoTotal'),
+                DB::raw('SUM(consumos.precio) as consumoDirectivoMenorVeinte'),
+            )
+            ->where('facturas.mes_pago', '=', $params->mes)
+            ->where('facturas.anio_pago', '=', $params->anio)
+            ->where('facturas.estado_pago', '=', 1)
+            ->where('consumos.directivo', '=', 1)
+            ->where('consumos.precio', '<=', 20)
+            ->groupBy('facturas.mes_pago')
+            ->get();
+
+        // Consulta NRO:2 Factura total pagado sin directivos menores a 20bs
+        $facturaTotalPagado = DB::table('facturas')
+            ->join(
+                'consumos',
+                'facturas.consumo_id',
+                '=',
+                'consumos.id'
+            )
+            ->select(
+                "facturas.mes_pago",
+                DB::raw('SUM(facturas.total_pagado) as facturaTotalPagado'),
             )
             ->where('facturas.mes_pago', '=', $params->mes)
             ->where('facturas.anio_pago', '=', $params->anio)
@@ -92,8 +111,7 @@ class ReportesController extends Controller
             ->groupBy('facturas.mes_pago')
             ->get();
 
-
-        // Agrupacion  de productos por mes de cobro
+        // consulta Nro.-3 Agrupacion  de productos por mes de cobro
         $details = DB::table('detalles')
             ->join('facturas', 'detalles.factura_id', '=', 'facturas.id')
             ->join('productos', 'detalles.producto_id', '=', 'productos.id')
@@ -112,56 +130,7 @@ class ReportesController extends Controller
             ->groupBy('productos.producto')
             ->get();
 
-
-        // Agrupacion del cobro total de la factura por mes
-        $facturas = DB::table('facturas')
-            ->join('consumos', 'facturas.consumo_id', '=', 'consumos.id')
-            ->select(
-                "facturas.mes_pago",
-                DB::raw('SUM(consumos.precio) as sumaFacturas_total'),
-            )
-            ->where('facturas.mes_pago', '=', $params->mes)
-            ->where('facturas.anio_pago', '=', $params->anio)
-            ->where('facturas.estado_pago', '=', 1)
-            ->groupBy('facturas.mes_pago')
-            ->get();
-
-
-        // Agrupacion del cobro total de la factura por mes
-        $facturaTotal = DB::table('facturas')
-            ->join(
-                'consumos',
-                'facturas.consumo_id',
-                '=',
-                'consumos.id'
-            )
-            ->select(
-                "facturas.mes_pago",
-                DB::raw('SUM(facturas.total_pagado) as sumaFacturas_total'),
-            )
-            ->where('facturas.mes_pago', '=', $params->mes)
-            ->where('facturas.anio_pago', '=', $params->anio)
-            ->where('facturas.estado_pago', '=', 1)
-            ->groupBy('facturas.mes_pago')
-            ->get();
-
-        // Agrupación del cobro total de los directivos menores a 20BS
-        $directivos = DB::table('facturas')
-            ->join('consumos', 'facturas.consumo_id', '=', 'consumos.id')
-            ->select(
-                "consumos.mes",
-                DB::raw('SUM(facturas.total_pagado) as sumaFacturasDirectivos_total'),
-            )
-            ->where('facturas.mes_pago', '=', $params->mes)
-            ->where('facturas.anio_pago', '=', $params->anio)
-            ->where('facturas.estado_pago', '=', 1)
-            ->where('consumos.precio', '<=', 20)
-            ->where('consumos.directivo', '=', 1)
-            ->groupBy('consumos.mes')
-            ->get();
-
-
-        // Agrupación del cobro total de los directivos menores a 20BS
+        // consulta NRO.4.- Total multas
         $multasRetrasos = DB::table('facturas')
             ->select(
                 "facturas.mes_pago",
@@ -174,8 +143,7 @@ class ReportesController extends Controller
             ->groupBy('facturas.mes_pago')
             ->get();
 
-
-        // Reporte de socios que tienen multa de reuniones
+        // Consulta NRO. 5 Reporte de socios que tienen multa de reuniones
         $multaReunion = DB::table('factura_reunion')
             ->join('facturas', 'factura_reunion.factura_id', '=', 'facturas.id')
             ->select(
@@ -188,53 +156,69 @@ class ReportesController extends Controller
             ->groupBy('facturas.mes_pago')
             ->get();
 
-        // echo count($directivos);
-        // Validar cuando sea cero
-        $sumaFinal = 0;
-        if (count($facturas) == 0) {
-            $sumaFinal = 0;
-        } else if (count($directivos) == 0 && count($multasRetrasos) != 0 && count($details) != 0) {
 
-            $sumaFinal = $facturas[0]->sumaFacturas_total - 0 - $multasRetrasos[0]->sumaFacturasRetrasos_total;
-            foreach ($details as $key => $value) {
-                $sumaFinal = $sumaFinal - $value->sumaProducto_total;
-            }
-        } else if (count($directivos) != 0 && count($multasRetrasos) == 0 && count($details) != 0) {
-
-            $sumaFinal = $facturas[0]->sumaFacturas_total - $directivos[0]->sumaFacturasDirectivos_total - 0;
-            foreach ($details as $key => $value) {
-                $sumaFinal = $sumaFinal - $value->sumaProducto_total;
-            }
-        } else  if (count($directivos) == 0 && count($multasRetrasos) == 0 && count($details) != 0) {
-            $sumaFinal = $facturas[0]->sumaFacturas_total;
-            foreach ($details as $key => $value) {
-                $sumaFinal = $sumaFinal - $value->sumaProducto_total;
-            }
-        } else if (count($directivos) != 0 && count($multasRetrasos) == 0 && count($details) == 0) {
-            $sumaFinal = $facturas[0]->sumaFacturas_total - $directivos[0]->sumaFacturasDirectivos_total - 0;
-        } else if (count($directivos) == 0 && count($multasRetrasos) != 0 && count($details) == 0) {
-            $sumaFinal = $facturas[0]->sumaFacturas_total - 0 - $multasRetrasos[0]->sumaFacturasRetrasos_total;
-        } else if (count($directivos) == 0 && count($multasRetrasos) == 0 && count($details) == 0) {
-            $sumaFinal = $facturas[0]->sumaFacturas_total - $directivos[0]->sumaFacturasDirectivos_total - $multasRetrasos[0]->sumaFacturasRetrasos_total;
-        } else {
-            $sumaFinal = $facturas[0]->sumaFacturas_total - $directivos[0]->sumaFacturasDirectivos_total - $multasRetrasos[0]->sumaFacturasRetrasos_total;
-            foreach ($details as $key => $value) {
-                $sumaFinal = $sumaFinal - $value->sumaProducto_total;
-            }
-        }
-
-        // die();
         $data = array(
             'status' => 'success',
             'code' => 200,
-            'consumoTotal' => $consumoTotal,
-            'facturaTotalMes' => $facturas,
-            'facturaTotalDirectivos' => $directivos,
-            'facturaTotalRetrasos' => $multasRetrasos,
-            'agrupados' => $details,
-            'multaReunion' => $multaReunion,
-            'consumoPrecioTotal' => $consumoTotal,
-            'facturaTotal' => $facturaTotal
+
+            'consumoDirectivoMenorVeinte' => $consumoDirectivoVeinte, // Nro.-1
+            'facturaTotalPagado' => $facturaTotalPagado, // Nro.-2
+            'facturaDetalle' => $details, // Nro.3
+            'facturaTotalRetrasos' => $multasRetrasos, // Nro.4
+            'multaReunion' => $multaReunion, // Nro.5
+
+        );
+
+        // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
+    }
+
+    public function cobroxMesSocios(CobroxMesSociosRequest $request)
+    {
+        // 1.-Recoger los usuarios por post
+        $params = (object) $request->all(); // Devulve un obejto
+
+        // Consulta NRO:1 solo consumo de todos en general
+        $listaSociosPagaron = DB::table('factura_reunion')
+            ->join('facturas', 'factura_reunion.factura_id', '=', 'facturas.id')
+            ->join('consumos', 'facturas.consumo_id', '=', 'consumos.id')
+            ->join('socios', 'consumos.socio_id', '=', 'socios.id')
+            ->join('personas', 'socios.persona_id', '=', 'personas.id')
+            ->select(
+                "facturas.id AS idFactura",
+                "facturas.estado_pago",
+                "facturas.retraso",
+                "facturas.directivo_especial",
+                "facturas.fecha_emision",
+                "facturas.total_pagado",
+                "factura_reunion.opcion",
+                "factura_reunion.precio AS reunionPrecio",
+                "socios.id AS idSocio",
+                "personas.nombres",
+                "personas.ap_paterno AS paterno",
+                "personas.ap_materno AS materno",
+                "personas.carnet",
+                "consumos.mes",
+                "consumos.anio",
+                "consumos.lecturaAnterior",
+                "consumos.LecturaActual",
+                "consumos.consumo",
+                "consumos.precio AS precioConsumo",
+                "consumos.estado",
+                "consumos.directivo"
+            )
+            ->where('facturas.mes_pago', '=', $params->mes)
+            ->where('facturas.anio_pago', '=', $params->anio)
+            ->where('facturas.estado_pago', '=', 1)
+            ->where('facturas.directivo_especial', '!=', 'si')
+            ->get();
+
+
+        $data = array(
+            'status' => 'success',
+            'code' => 200,
+            'listaSociosPagaron' => $listaSociosPagaron,
+
         );
 
         // Devuelve en json con laravel

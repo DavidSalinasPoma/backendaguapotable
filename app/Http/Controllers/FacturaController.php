@@ -150,6 +150,7 @@ class FacturaController extends Controller
 
                 $factura->fecha_emision = $fecha;
                 $factura->estado_pago = 1;
+                $factura->directivo_especial = 'si';
                 try {
 
                     $factura->save();
@@ -397,6 +398,7 @@ class FacturaController extends Controller
             ->join('personas', 'socios.persona_id', '=', 'personas.id')
             ->join('barrios', 'socios.barrio_id', '=', 'barrios.id')
             ->select(
+                "facturas.id AS idFactura",
                 "facturas.fecha_emision",
                 "facturas.total_pagado",
                 "consumos.mes AS periodo",
