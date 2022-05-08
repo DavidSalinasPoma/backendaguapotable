@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\reportes\CobroxMesRequest;
 use App\Http\Requests\reportes\CobroxMesSociosRequest;
+use App\Http\Requests\reportes\ListaDeudoresRequest;
 use App\Models\Detalle;
 use App\Models\Productos;
 use Carbon\Carbon;
@@ -103,7 +104,7 @@ class ReportesController extends Controller
             )
             ->select(
                 "facturas.mes_pago",
-                DB::raw('SUM(facturas.total_pagado) as facturaTotalPagado'),
+                DB::raw('SUM(facturas.total_pagado) as facturaTotal'),
             )
             ->where('facturas.mes_pago', '=', $params->mes)
             ->where('facturas.anio_pago', '=', $params->anio)
@@ -179,8 +180,8 @@ class ReportesController extends Controller
         $params = (object) $request->all(); // Devulve un obejto
 
         // Consulta NRO:1 solo consumo de todos en general
-        $listaSociosPagaron = DB::table('factura_reunion')
-            ->join('facturas', 'factura_reunion.factura_id', '=', 'facturas.id')
+        $listaSociosPagaron = DB::table('facturas')
+            ->leftJoin('factura_reunion', 'facturas.id', '=', 'factura_reunion.factura_id')
             ->join('consumos', 'facturas.consumo_id', '=', 'consumos.id')
             ->join('socios', 'consumos.socio_id', '=', 'socios.id')
             ->join('personas', 'socios.persona_id', '=', 'personas.id')
@@ -210,7 +211,69 @@ class ReportesController extends Controller
             ->where('facturas.mes_pago', '=', $params->mes)
             ->where('facturas.anio_pago', '=', $params->anio)
             ->where('facturas.estado_pago', '=', 1)
-            ->where('facturas.directivo_especial', '!=', 'si')
+            ->where('facturas.directivo_especial', '=', 'no')
+            ->orderBy('socios.id', 'ASC')
+            ->get();
+
+
+        // Consulta NRO:2 solo consumo de todos en general
+        $suma = DB::table('facturas')
+            ->leftJoin('factura_reunion', 'facturas.id', '=', 'factura_reunion.factura_id')
+            ->select(
+                "facturas.mes_pago",
+                DB::raw('SUM(facturas.total_pagado) as facturaTotalPagado'),
+            )
+            ->where('facturas.mes_pago', '=', $params->mes)
+            ->where('facturas.anio_pago', '=', $params->anio)
+            ->where('facturas.estado_pago', '=', 1)
+            ->where('facturas.directivo_especial', '=', 'no')
+            ->groupBy('facturas.mes_pago')
+            ->get();
+
+        // Consulta NRO:3 solo consumo de todos en general
+        $listaDirectivosBeneficiarios = DB::table('facturas')
+            ->leftJoin('factura_reunion', 'facturas.id', '=', 'factura_reunion.factura_id')
+            ->join(
+                'consumos',
+                'facturas.consumo_id',
+                '=',
+                'consumos.id'
+            )
+            ->join(
+                'socios',
+                'consumos.socio_id',
+                '=',
+                'socios.id'
+            )
+            ->join('personas', 'socios.persona_id', '=', 'personas.id')
+            ->select(
+                "facturas.id AS idFactura",
+                "facturas.estado_pago",
+                "facturas.retraso",
+                "facturas.directivo_especial",
+                "facturas.fecha_emision",
+                "facturas.total_pagado",
+                "factura_reunion.opcion",
+                "factura_reunion.precio AS reunionPrecio",
+                "socios.id AS idSocio",
+                "personas.nombres",
+                "personas.ap_paterno AS paterno",
+                "personas.ap_materno AS materno",
+                "personas.carnet",
+                "consumos.mes",
+                "consumos.anio",
+                "consumos.lecturaAnterior",
+                "consumos.LecturaActual",
+                "consumos.consumo",
+                "consumos.precio AS precioConsumo",
+                "consumos.estado",
+                "consumos.directivo"
+            )
+            ->where('facturas.mes_pago', '=', $params->mes)
+            ->where('facturas.anio_pago', '=', $params->anio)
+            ->where('facturas.estado_pago', '=', 1)
+            ->where('facturas.directivo_especial', '=', 'si')
+            ->orderBy('socios.id', 'ASC')
             ->get();
 
 
@@ -218,10 +281,18 @@ class ReportesController extends Controller
             'status' => 'success',
             'code' => 200,
             'listaSociosPagaron' => $listaSociosPagaron,
+            'listaDirectivosBeneficiarios' => $listaDirectivosBeneficiarios,
+            'suma' => $suma,
 
         );
 
         // Devuelve en json con laravel
         return response()->json($data, $data['code']);
+    }
+
+    public function listaDeudores(ListaDeudoresRequest $request)
+    {
+        // 1.-Recoger los usuarios por post
+        $params = (object) $request->all(); // Devulve un obejto
     }
 }
