@@ -51,7 +51,7 @@ class FacturaController extends Controller
                 "consumos.consumo",
                 "consumos.precio AS precioConsumo",
             )
-            ->paginate(5);
+            ->paginate(10);
 
         $data = array(
             'code' => 200,
@@ -211,7 +211,7 @@ class FacturaController extends Controller
                         'code' => 200,
                         'message' => 'La factura se ha creado correctamente',
                         'factura'  => $factura,
-                        'socioMulta' => $socioMulta,
+                        // 'socioMulta' => $socioMulta,
                         // 'opcion' => $socioMulta->opcion,
                     );
                 } catch (Exception $e) {
@@ -278,6 +278,9 @@ class FacturaController extends Controller
                                     $facturaReunion->save();
                                     break;
                             }
+                            $pregunta = 'si';
+                        } else {
+                            $pregunta = 'no';
                         }
                     }
                     // Fin Logica para guardar facturaDetalle
@@ -287,6 +290,7 @@ class FacturaController extends Controller
                     // Aqui guardando datos de factura detalle
                     $producto = Productos::all();
 
+
                     foreach ($producto as $key => $item) {
                         if ($item->estado == 1) {
                             $detalle = new Detalle();
@@ -295,8 +299,10 @@ class FacturaController extends Controller
                             $detalle->precio = $item->precio;
                             $detalle->save();
 
+
                             $sinLectura = Lista::where('listas.estado', '=', 0)->count();
                             if ($sinLectura == 0) {
+                                $test = 'hola';
                                 $cantidad = 0;
 
                                 if ($item->nombre == 'evento' && $item->cantidad > 0) {
@@ -314,15 +320,18 @@ class FacturaController extends Controller
                                     Productos::where('id', $item->id)->update($arrayParams);
                                     Evento::where('id', $item->num_producto)->update($arrayParams);
                                 }
+                            } else {
+                                $test = 'hola2';
                             }
                         }
+                        $test = 'hola3';
                     }
                     $data = array(
                         'status' => 'success',
                         'code' => 200,
                         'message' => 'La factura se ha creado correctamente',
                         'factura'  => $factura,
-                        'socioMulta' => $socioMulta,
+                        // 'socioMulta' => $socioMulta,
                         // 'opcion' => $socioMulta->opcion,
                     );
                 } catch (Exception $e) {
@@ -330,7 +339,9 @@ class FacturaController extends Controller
                         'status' => 'Error',
                         'code' => 404,
                         'message' => $e,
-                        'toto' => $listaReunion
+                        'toto' => $listaReunion,
+                        'pregunta' => $pregunta,
+                        'test' => $test
                     );
                 }
             }

@@ -73,7 +73,7 @@ class ConsumoController extends Controller
                 'errors' => $validate->errors()
             );
         } else {
-            // Si la validacion pasa correctamente
+
             // Crear el objeto usuario para guardar en la base de datos
             $consumo = new Consumo();
             $consumo->lecturaAnterior = $params->lecturaAnterior;
@@ -89,36 +89,50 @@ class ConsumoController extends Controller
                 'estado' => 1
             );
 
-
             try {
-                // Guardar en la base de datos
-                // 5.-Crear el usuario
-                $consumo->save();
-                // 5.- Actualizar los datos en la base de datos.
-                // Lista::where('id', $params->lista_id)->update($paramsArray);
-                DB::table('listas')
-                    ->where('id', $params->lista_id)
-                    ->update($paramsArray);
 
-                // Logica para modificar el estado_consumo de reunion
-                $lista = Lista::where("estado", "=", 0)->get(); // Trae el usuario en formato JSON
-                if (count($lista) == 0) {
-                    $paramsArrayLista = array(
-                        'estado_consumo' => 1
+                // Validar que no exita datos duplicados
+                $validarDuplicado = Consumo::where("mes", "=", $params->mes)
+                    ->where("anio", "=", $params->anio)
+                    ->where("socio_id", "=", $params->socio_id)
+                    ->get(); // Trae el usuario en formato JSON
+
+                if (count($validarDuplicado) == 0) {
+                    // 5.-Crear el usuario
+                    $consumo->save();
+                    // 5.- Actualizar los datos en la base de datos.
+                    // Lista::where('id', $params->lista_id)->update($paramsArray);
+                    DB::table('listas')
+                        ->where('id', $params->lista_id)
+                        ->update($paramsArray);
+
+                    // Logica para modificar el estado_consumo de reunion
+                    $lista = Lista::where("estado", "=", 0)->get(); // Trae el usuario en formato JSON
+                    if (count($lista) == 0) {
+                        $paramsArrayLista = array(
+                            'estado_consumo' => 1
+                        );
+                        // Reunion::where('estado', '=', 1)->update($paramsArrayLista);
+                        DB::table('reuniones')
+                            ->where('estado', '=', 1)
+                            ->update($paramsArrayLista);
+                    }
+                    // Fin Logica para modificar el estado de reunion Consumo
+                    $data = array(
+                        'status' => 'success',
+                        'code' => 200,
+                        'message' => 'El consumo se ha creado correctamente',
+                        'consumo'  => $consumo
                     );
-                    // Reunion::where('estado', '=', 1)->update($paramsArrayLista);
-                    DB::table('reuniones')
-                        ->where('estado', '=', 1)
-                        ->update($paramsArrayLista);
+                } else {
+                    // Fin Logica para modificar el estado de reunion Consumo
+                    $data = array(
+                        'status' => 'success',
+                        'code' => 404,
+                        'message' => 'Este registro ya existe',
+                        'validarDuplicado'  => $validarDuplicado
+                    );
                 }
-                // Fin Logica para modificar el estado de reunion Consumo
-
-                $data = array(
-                    'status' => 'success',
-                    'code' => 200,
-                    'message' => 'El consumo se ha creado correctamente',
-                    'consumo'  => $consumo
-                );
             } catch (Exception $e) {
                 $data = array(
                     'status' => 'Error',

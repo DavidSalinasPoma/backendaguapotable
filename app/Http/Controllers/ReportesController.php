@@ -290,9 +290,46 @@ class ReportesController extends Controller
         return response()->json($data, $data['code']);
     }
 
-    public function listaDeudores(ListaDeudoresRequest $request)
+    public function listaDeudores()
     {
-        // 1.-Recoger los usuarios por post
-        $params = (object) $request->all(); // Devulve un obejto
+        // Consulta NRO:1 solo consumo de todos en general
+        $listaCorte = DB::table('facturas')
+            ->leftJoin('factura_reunion', 'facturas.id', '=', 'factura_reunion.factura_id')
+            ->join(
+                'consumos',
+                'facturas.consumo_id',
+                '=',
+                'consumos.id'
+            )
+            ->join(
+                'socios',
+                'consumos.socio_id',
+                '=',
+                'socios.id'
+            )
+            ->join('personas', 'socios.persona_id', '=', 'personas.id')
+            ->select(
+                "personas.nombres",
+                "personas.ap_paterno AS paterno",
+                "personas.ap_materno AS materno",
+                "personas.carnet",
+                "socios.id AS idSocio",
+                DB::raw('count(socios.id) as cantMeses'),
+            )
+            ->where('facturas.estado_pago', '=', 0)
+            ->where('facturas.directivo_especial', '=', 'no')
+            ->groupBy('socios.id')
+            ->orderBy('socios.id', 'ASC')
+            ->get();
+
+
+        $data = array(
+            'status' => 'success',
+            'code' => 200,
+            'listaCorte' => $listaCorte
+        );
+
+        // Devuelve en json con laravel
+        return response()->json($data, $data['code']);
     }
 }

@@ -195,7 +195,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post('/api/indexreportes/cobroxmesocios', [ReportesController::class, 'cobroxMesSocios']);
 
-    Route::post('/api/indexreportes/listaDeudores', [ReportesController::class, 'listaDeudores']);
+    Route::get('/api/indexreportes/listaDeudores', [ReportesController::class, 'listaDeudores']);
 
 
     /*************RUTAS PARA DETALLE REUNIONES********/
