@@ -323,6 +323,7 @@ class SocioController extends Controller
                 "personas.ap_paterno",
                 "personas.ap_materno",
                 "socios.estado",
+                "socios.created_at",
                 "socios.directivo",
                 "barrios.nombre"
             )

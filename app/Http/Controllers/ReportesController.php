@@ -309,10 +309,7 @@ class ReportesController extends Controller
             )
             ->join('personas', 'socios.persona_id', '=', 'personas.id')
             ->select(
-                "personas.nombres",
-                "personas.ap_paterno AS paterno",
-                "personas.ap_materno AS materno",
-                "personas.carnet",
+
                 "socios.id AS idSocio",
                 DB::raw('count(socios.id) as cantMeses'),
             )
