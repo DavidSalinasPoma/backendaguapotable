@@ -292,6 +292,8 @@ class ReportesController extends Controller
 
     public function listaDeudores()
     {
+        $listDeudores = [];
+
         // Consulta NRO:1 solo consumo de todos en general
         $listaCorte = DB::table('facturas')
             ->leftJoin('factura_reunion', 'facturas.id', '=', 'factura_reunion.factura_id')
@@ -319,11 +321,39 @@ class ReportesController extends Controller
             ->orderBy('socios.id', 'ASC')
             ->get();
 
+        // Poner nombres
+        foreach ($listaCorte as $key => $element) {
+            // Devuelve un array de objetos
+            $socio = DB::table('socios')
+                ->join(
+                    'personas',
+                    'socios.persona_id',
+                    '=',
+                    'personas.id'
+                )
+                ->select(
+                    "personas.nombres",
+                    "personas.ap_paterno",
+                    "personas.ap_materno"
+                )
+                ->where('socios.id', '=', $element->idSocio)
+                ->get();
+            // Armar el array de datos
+            $deudor = array(
+                'idSocio' => $element->idSocio,
+                'cantMeses' => $element->cantMeses,
+                'nombres' => $socio[0]->nombres,
+                'paterno' => $socio[0]->ap_paterno,
+                'materno' => $socio[0]->ap_materno
+            );
+
+            array_push($listDeudores, $deudor);
+        }
 
         $data = array(
             'status' => 'success',
             'code' => 200,
-            'listaCorte' => $listaCorte
+            'listaCorte' => $listDeudores
         );
 
         // Devuelve en json con laravel

@@ -77,9 +77,6 @@ class ReunionesController extends Controller
 
                 $data = Reunion::latest('id')->first();
 
-                // echo $data->id;
-                // die();
-
                 // logica carga de lista
                 $socio = Socio::all()->load('persona');
 

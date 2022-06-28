@@ -732,7 +732,498 @@ class ConsumoController extends Controller
             case 136:
                 $precio = 259.5;
                 break;
-
+            case 137:
+                $precio = 261.5;
+                break;
+            case 138:
+                $precio = 263.5;
+                break;
+            case 139:
+                $precio = 265.5;
+                break;
+            case 140:
+                $precio = 267.5;
+                break;
+            case 141:
+                $precio = 269.5;
+                break;
+            case 142:
+                $precio = 271.5;
+                break;
+            case 143:
+                $precio = 273.5;
+                break;
+            case 144:
+                $precio = 275.5;
+                break;
+            case 145:
+                $precio = 277.5;
+                break;
+            case 146:
+                $precio = 279.5;
+                break;
+            case 147:
+                $precio = 281.5;
+                break;
+            case 148:
+                $precio = 283.5;
+                break;
+            case 149:
+                $precio = 285.5;
+                break;
+            case 150:
+                $precio = 287.5;
+                break;
+            case 151:
+                $precio = 289.5;
+                break;
+            case 152:
+                $precio = 291.5;
+                break;
+            case 153:
+                $precio = 293.5;
+                break;
+            case 154:
+                $precio = 295.5;
+                break;
+            case 155:
+                $precio = 297.5;
+                break;
+            case 156:
+                $precio = 299.5;
+                break;
+            case 157:
+                $precio = 301.5;
+                break;
+            case 158:
+                $precio = 303.5;
+                break;
+            case 159:
+                $precio = 305.5;
+                break;
+            case 160:
+                $precio = 307.5;
+                break;
+            case 161:
+                $precio = 309.5;
+                break;
+            case 162:
+                $precio = 311.5;
+                break;
+            case 163:
+                $precio = 313.5;
+                break;
+            case 164:
+                $precio = 315.5;
+                break;
+            case 165:
+                $precio = 317.5;
+                break;
+            case 166:
+                $precio = 319.5;
+                break;
+            case 167:
+                $precio = 321.5;
+                break;
+            case 168:
+                $precio = 323.5;
+                break;
+            case 169:
+                $precio = 325.5;
+                break;
+            case 170:
+                $precio = 327.5;
+                break;
+            case 171:
+                $precio = 329.5;
+                break;
+            case 172:
+                $precio = 331.5;
+                break;
+            case 173:
+                $precio = 333.5;
+                break;
+            case 174:
+                $precio = 335.5;
+                break;
+            case 175:
+                $precio = 337.5;
+                break;
+            case 176:
+                $precio = 339.5;
+                break;
+            case 177:
+                $precio = 341.5;
+                break;
+            case 178:
+                $precio = 343.5;
+                break;
+            case 179:
+                $precio = 345.5;
+                break;
+            case 180:
+                $precio = 347.5;
+                break;
+            case 181:
+                $precio = 349.5;
+                break;
+            case 182:
+                $precio = 351.5;
+                break;
+            case 183:
+                $precio = 353.5;
+                break;
+            case 184:
+                $precio = 355.5;
+                break;
+            case 185:
+                $precio = 357.5;
+                break;
+            case 186:
+                $precio = 359.5;
+                break;
+            case 187:
+                $precio = 361.5;
+                break;
+            case 188:
+                $precio = 363.5;
+                break;
+            case 189:
+                $precio = 365.5;
+                break;
+            case 190:
+                $precio = 367.5;
+                break;
+            case 191:
+                $precio = 369.5;
+                break;
+            case 192:
+                $precio = 371.5;
+                break;
+            case 193:
+                $precio = 373.5;
+                break;
+            case 194:
+                $precio = 375.5;
+                break;
+            case 195:
+                $precio = 377.5;
+                break;
+            case 196:
+                $precio = 379.5;
+                break;
+            case 197:
+                $precio = 381.5;
+                break;
+            case 198:
+                $precio = 383.5;
+                break;
+            case 199:
+                $precio = 385.5;
+                break;
+            case 200:
+                $precio = 387.5;
+                break;
+            case 201:
+                $precio = 389.5;
+                break;
+            case 202:
+                $precio = 391.5;
+                break;
+            case 203:
+                $precio = 393.5;
+                break;
+            case 204:
+                $precio = 395.5;
+                break;
+            case 205:
+                $precio = 397.5;
+                break;
+            case 206:
+                $precio = 399.5;
+                break;
+            case 207:
+                $precio = 401.5;
+                break;
+            case 208:
+                $precio = 403.5;
+                break;
+            case 209:
+                $precio = 405.5;
+                break;
+            case 210:
+                $precio = 407.5;
+                break;
+            case 211:
+                $precio = 409.5;
+                break;
+            case 212:
+                $precio = 411.5;
+                break;
+            case 213:
+                $precio = 413.5;
+                break;
+            case 214:
+                $precio = 415.5;
+                break;
+            case 215:
+                $precio = 417.5;
+                break;
+            case 216:
+                $precio = 419.5;
+                break;
+            case 217:
+                $precio = 421.5;
+                break;
+            case 218:
+                $precio = 423.5;
+                break;
+            case 219:
+                $precio = 425.5;
+                break;
+            case 220:
+                $precio = 427.5;
+                break;
+            case 221:
+                $precio = 429.5;
+                break;
+            case 222:
+                $precio = 431.5;
+                break;
+            case 223:
+                $precio = 433.5;
+                break;
+            case 224:
+                $precio = 435.5;
+                break;
+            case 225:
+                $precio = 437.5;
+                break;
+            case 226:
+                $precio = 439.5;
+                break;
+            case 227:
+                $precio = 441.5;
+                break;
+            case 228:
+                $precio = 443.5;
+                break;
+            case 229:
+                $precio = 445.5;
+                break;
+            case 230:
+                $precio = 447.5;
+                break;
+            case 231:
+                $precio = 449.5;
+                break;
+            case 232:
+                $precio = 451.5;
+                break;
+            case 233:
+                $precio = 453.5;
+                break;
+            case 234:
+                $precio = 455.5;
+                break;
+            case 235:
+                $precio = 457.5;
+                break;
+            case 236:
+                $precio = 459.5;
+                break;
+            case 237:
+                $precio = 461.5;
+                break;
+            case 238:
+                $precio = 463.5;
+                break;
+            case 239:
+                $precio = 465.5;
+                break;
+            case 240:
+                $precio = 467.5;
+                break;
+            case 241:
+                $precio = 469.5;
+                break;
+            case 242:
+                $precio = 471.5;
+                break;
+            case 243:
+                $precio = 473.5;
+                break;
+            case 244:
+                $precio = 475.5;
+                break;
+            case 245:
+                $precio = 477.5;
+                break;
+            case 246:
+                $precio = 479.5;
+                break;
+            case 247:
+                $precio = 481.5;
+                break;
+            case 248:
+                $precio = 483.5;
+                break;
+            case 249:
+                $precio = 485.5;
+                break;
+            case 250:
+                $precio = 487.5;
+                break;
+            case 251:
+                $precio = 489.5;
+                break;
+            case 252:
+                $precio = 491.5;
+                break;
+            case 253:
+                $precio = 493.5;
+                break;
+            case 254:
+                $precio = 495.5;
+                break;
+            case 255:
+                $precio = 497.5;
+                break;
+            case 256:
+                $precio = 499.5;
+                break;
+            case 257:
+                $precio = 501.5;
+                break;
+            case 258:
+                $precio = 503.5;
+                break;
+            case 259:
+                $precio = 505.5;
+                break;
+            case 260:
+                $precio = 507.5;
+                break;
+            case 261:
+                $precio = 509.5;
+                break;
+            case 262:
+                $precio = 511.5;
+                break;
+            case 263:
+                $precio = 513.5;
+                break;
+            case 264:
+                $precio = 515.5;
+                break;
+            case 265:
+                $precio = 517.5;
+                break;
+            case 266:
+                $precio = 519.5;
+                break;
+            case 267:
+                $precio = 521.5;
+                break;
+            case 268:
+                $precio = 523.5;
+                break;
+            case 269:
+                $precio = 525.5;
+                break;
+            case 270:
+                $precio = 527.5;
+                break;
+            case 271:
+                $precio = 529.5;
+                break;
+            case 272:
+                $precio = 531.5;
+                break;
+            case 273:
+                $precio = 533.5;
+                break;
+            case 274:
+                $precio = 535.5;
+                break;
+            case 275:
+                $precio = 537.5;
+                break;
+            case 276:
+                $precio = 539.5;
+                break;
+            case 277:
+                $precio = 541.5;
+                break;
+            case 278:
+                $precio = 543.5;
+                break;
+            case 279:
+                $precio = 545.5;
+                break;
+            case 280:
+                $precio = 547.5;
+                break;
+            case 281:
+                $precio = 549.5;
+                break;
+            case 282:
+                $precio = 551.5;
+                break;
+            case 283:
+                $precio = 553.5;
+                break;
+            case 284:
+                $precio = 555.5;
+                break;
+            case 285:
+                $precio = 557.5;
+                break;
+            case 286:
+                $precio = 559.5;
+                break;
+            case 287:
+                $precio = 561.5;
+                break;
+            case 288:
+                $precio = 563.5;
+                break;
+            case 289:
+                $precio = 565.5;
+                break;
+            case 290:
+                $precio = 567.5;
+                break;
+            case 291:
+                $precio = 569.5;
+                break;
+            case 292:
+                $precio = 571.5;
+                break;
+            case 293:
+                $precio = 573.5;
+                break;
+            case 294:
+                $precio = 575.5;
+                break;
+            case 295:
+                $precio = 577.5;
+                break;
+            case 296:
+                $precio = 579.5;
+                break;
+            case 297:
+                $precio = 581.5;
+                break;
+            case 298:
+                $precio = 583.5;
+                break;
+            case 299:
+                $precio = 585.5;
+                break;
+            case 300:
+                $precio = 587.5;
+                break;
             default:
                 $precio = 0;
                 break;

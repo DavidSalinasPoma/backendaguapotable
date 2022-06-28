@@ -8,6 +8,7 @@ use App\Http\Controllers\DetallereunionController;
 use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\EventoController;
 use App\Http\Controllers\FacturaController;
+use App\Http\Controllers\FacturaReunionController;
 use App\Http\Controllers\ListaController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\ProductosController;
@@ -207,6 +208,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/api/indexlista/detalleReunion/{id}', [DetallereunionController::class, 'indexListaDetalle']);
 
     Route::put('/api/lista/detalleReunion/{id}', [DetallereunionController::class, 'updateListaDetalle']);
+
+    /*************RUTAS PARA FACTURA DETALLE********/
+    // Utilizando rutas automatica para Factura Reunion
+    Route::resource('/api/facturaReunion', FacturaReunionController::class);
+    Route::post('/api/indexfacturareunion', [FacturaReunionController::class, 'indexFacturaReunion']);
+
 
     // Ruta para cerrar sesion o eliminar un token
     Route::post('/api/logout', [UserController::class, 'logout']);
