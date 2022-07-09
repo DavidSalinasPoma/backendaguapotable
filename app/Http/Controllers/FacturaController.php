@@ -525,7 +525,7 @@ class FacturaController extends Controller
                 // ->where('personas.carnet', '=', $texto)
                 ->orWhere('socios.id', '=', $texto)
                 ->orderBy('facturas.id', 'DESC')
-                ->paginate(5);
+                ->paginate(10);
 
             $data = array(
                 'status' => 'success',
